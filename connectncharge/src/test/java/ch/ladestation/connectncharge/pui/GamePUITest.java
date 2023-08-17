@@ -137,6 +137,7 @@ public class GamePUITest extends ComponentTest {
         var model = new Game();
         var controller = new ApplicationController(model);
         controller.setGameStarted(true);
+        controller.awaitCompletion(); //what the heck? why is this so flipping inconsistent?
         var mockLedStrip = mock(Ws281xLedStrip.class);
         GamePUI pui = new GamePUI(controller, this.pi4j, mockLedStrip);
         var inOrder = inOrder(mockLedStrip);
