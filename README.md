@@ -1,3 +1,7 @@
+[![workflow badge](https://github.com/MMMMMNG/Connect-n-Charge-II/actions/workflows/maven.yml/badge.svg)](https://github.com/MMMMMNG/Connect-n-Charge-II/actions/workflows/maven.yml)
+[![coverage badge](https://mmmmmng.github.io/Connect-n-Charge-II/jacoco.svg)](https://mmmmmng.github.io/Connect-n-Charge-II/jacoco/index.html)
+[![JavaDoc](https://img.shields.io/badge/javadoc-1.0%EF%BC%8DSNAPSHOT-brightgreen.svg)](https://mmmmmng.github.io/Connect-n-Charge-II/apidocs/)
+
 # ip12-22vt_ladestationen
 FHNW Computer Science Student Project Semester 1&2
 
@@ -7,12 +11,6 @@ FHNW Computer Science Student Project Semester 1&2
 Connect 'n Charge ist ein strategisches Brettspiel, bei dem die Spieler dazu aufgefordert werden, Netzwerkverbindungen zu verknüpfen und dabei Ressourceneffizienz zu optimieren.
 Die Spieler übernehmen die Rolle des Managers einer idyllischen Feriensiedlung mit 30 Ferienhäusern, die dazu beitragen sollen, umweltfreundliche Mobilität zu fördern, indem 13 Häuser mit modernen E-Ladestationen ausgestattet werden.
 Die Herausforderung liegt dabei in der optimalen Nutzung von Ressourcen und der Schaffung eines effizienten Verteilungsnetzes.
-
-
-![workflow badge](https://github.com/fhnw-sgi-ip12-22vt/ip12-22vt_ladestationen/actions/workflows/maven.yml/badge.svg)
-![coverage badge](https://fhnw-sgi-ip12-22vt.github.io/ip12-22vt_ladestationen/jacoco.svg)
-
-Check out the latest [JavaDoc](https://fhnw-sgi-ip12-22vt.github.io/ip12-22vt_ladestationen/apidocs/ch.ladestation.connectncharge/module-summary.html) on our [Project Pages](https://fhnw-sgi-ip12-22vt.github.io/ip12-22vt_ladestationen/)
 
 ## Setup in IntelliJ IDEA
 This repo on GitHub is a fusion of the code and docu repositories, which is why it's a bit tricky to open it as a maven project in Intellij IDEA:
