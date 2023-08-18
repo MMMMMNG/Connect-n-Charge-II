@@ -24,7 +24,6 @@
                 <role>Usability Manager</role>
                 <role>Project Manager</role>
             </roles>
-            <id>4216</id>
             <name>Marvin Vogel</name>
             <email>marvin.vogel@students.fhnw.ch</email>
         </developer>
@@ -33,7 +32,6 @@
                 <role>Hardware Developer</role>
                 <role>Testing Manager</role>
             </roles>
-            <id>4217</id>
             <name>Marius Gebhardt</name>
             <email>marius.gebhardt@students.fhnw.ch</email>
         </developer>
@@ -42,7 +40,6 @@
                 <role>QA</role>
                 <role>Usability Manager</role>
             </roles>
-            <id>3178</id>
             <name>Shenia Scherer</name>
             <email>shenia.scherer@students.fhnw.ch</email>
         </developer>
@@ -51,7 +48,6 @@
                 <role>Software Architect</role>
                 <role>Requirements Engineer</role>
             </roles>
-            <id>4211</id>
             <name>Alexander Spiridonow</name>
             <email>alexander.spiridonow@students.fhnw.ch</email>
         </developer>
@@ -60,7 +56,6 @@
                 <role>Requirements Engineer</role>
                 <role>Software Developer</role>
             </roles>
-            <id>2181</id>
             <name>Gabriele Ferrali</name>
             <email>gabriele.ferrali@students.fhnw.ch</email>
         </developer>
@@ -69,7 +64,6 @@
                 <role>Project Manager</role>
                 <role>Information Manager</role>
             </roles>
-            <id>4213</id>
             <name>Pascal Stich</name>
             <email>pascal.stich@students.fhnw.ch</email>
         </developer>
@@ -77,12 +71,13 @@
             <roles>
                 <role>QA</role>
             </roles>
-            <id>4848</id>
             <name>Zeljko Grujic</name>
             <email>zeljko.grujic@students.fhnw.ch</email>
         </developer>
         <developer>
-            <id>4208</id>
+            <roles>
+                <role>Information Manager</role>
+            </roles>
             <name>Patrick Hernandez</name>
             <email>patrick.hernandez@students.fhnw.ch</email>
         </developer>
@@ -98,7 +93,7 @@
         <pi.ipnumber>10.175.31.132</pi.ipnumber>
         <pi.port>22</pi.port>
         <pi.deploydirectory>/home/pi/deploy</pi.deploydirectory>
-        <!--<pi.remote.jvmOptions>-jar ${pi.deploydirectory}/${project.build.finalName}.jar</pi.remote.jvmOptions>-->
+
         <pi.remote.jvmOptions/>
         <!-- If a mouse is attached to Pi use 'true' -->
         <pi.drm.enable.cursor>true</pi.drm.enable.cursor>
@@ -109,7 +104,7 @@
         <!-- Project Dependency Versions-->
         <javafx.version>17.0.2</javafx.version>
         <pi4j.version>2.3.0</pi4j.version>
-        <slf4j.version>1.7.32</slf4j.version>
+        <slf4j.version>2.0.7</slf4j.version>
         <junit.version>5.9.0</junit.version>
         <rpi-ws281x-java.version>2.0.0-SNAPSHOT</rpi-ws281x-java.version>
 
@@ -123,7 +118,6 @@
         <maven-dependency-plugin.version>3.2.0</maven-dependency-plugin.version>
         <maven-jar-plugin.version>3.2.1</maven-jar-plugin.version>
         <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
 
         <!-- Maven Properties -->
@@ -160,19 +154,13 @@
         <maven-checkstyle-plugin.excludes>
             **/module-info.java,**/jni/*.java
         </maven-checkstyle-plugin.excludes>
-        <log4j-core.version>2.20.0</log4j-core.version>
         <maven-javadoc-plugin.excludePackageNames>
             com.github.mbelling.ws281x.jni,org.openjfx
         </maven-javadoc-plugin.excludePackageNames>
+        <puppycrawl-tools-checkstyle.version>10.3.4</puppycrawl-tools-checkstyle.version>
+        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+        <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
     </properties>
-    <!-- local repo for the ws_28x library
-    <repositories>
-        <repository>
-            <id>project.local</id>
-            <name>project</name>
-            <url>file:${project.basedir}/repo</url>
-        </repository>
-    </repositories>-->
 
     <dependencies>
 
@@ -185,6 +173,11 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
             <version>${javafx.version}</version>
         </dependency>
         <dependency>
@@ -224,32 +217,31 @@
             <artifactId>pi4j-plugin-linuxfs</artifactId>
             <version>${pi4j.version}</version>
         </dependency>
-        <!-- Pi4J Mock Platform -->
+        <!-- Pi4J Mock Platform
+             Not scoped to just tests because it is also used when the app is run on a desktop environment-->
         <dependency>
             <groupId>com.pi4j</groupId>
             <artifactId>pi4j-plugin-mock</artifactId>
             <version>${pi4j.version}</version>
-            <!-- <scope>test</scope> -->
         </dependency>
 
-        <!-- include wrapped c library to interface LED-Strips-->
-        <!--<dependency>
-            <groupId>com.github.mbelling</groupId>
-            <artifactId>rpi-ws281x-java</artifactId>
-            <version>${rpi-ws281x-java.version}</version>
-        </dependency>-->
-        <!-- since shading the dependency with gradle seems impossible as of right now,
-        the transient dependency of the ws281x library is instead included here-->
+        <!--Logging: All logging is done with SLF4J, even in the absorbed mbelling
+            WS281x library (was manually transferred from pi4j). It is the conflicting logging
+            dependencies that caused a problem  at runtime and that's why the
+            jar is NOT used but instead the code is absorbed into this very project -->
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j-core.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>${log4j-core.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
         </dependency>
+
+
         <!-- JUnit -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -270,6 +262,7 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- for checkstyle -->
         <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
@@ -307,37 +300,27 @@
                 <artifactId>maven-site-plugin</artifactId>
                 <version>${maven-site-plugin.version}</version>
             </plugin>
-
-            <!-- shade conflicting dependencies
+            <!-- testing -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>${maven-shade-plugin.version}</version>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+            </plugin>
+
+            <!-- code coverage with jacoco -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin.version}</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <id>default-prepare-agent</id>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>prepare-agent</goal>
                         </goals>
-                        <configuration>
-                            <outputFile>${basedir}/target/distribution/${project.build.finalName}.jar</outputFile>
-                            <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>${project.groupId}.AppStarter</mainClass>
-                                </transformer>
-                            </transformers>
-                            <relocations>
-                                log4j causes conflicts
-                                <relocation>
-                                    <pattern>org.apache.logging.log4j</pattern>
-                                    <shadedPattern>shaded.org.apache.logging.log4j</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
 
             <plugin>
                 <groupId>com.gluonhq</groupId>
@@ -382,6 +365,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -409,6 +393,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -441,6 +426,7 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>${maven-checkstyle.version}</version>
                 <executions>
@@ -462,50 +448,11 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>10.3.4</version>
+                        <version>${puppycrawl-tools-checkstyle.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <version>${maven-antrun-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven-compiler-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>${maven-dependency-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>${maven-jar-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${maven-javadoc-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>${exec-maven-plugin.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
     <reporting>
         <plugins>
@@ -567,6 +514,21 @@
                 </reportSets>
             </plugin>
 
+            <!--configure jacoco plugin report-->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <!-- select non-aggregate reports -->
+                            <report>report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+
+            <!-- checksytle report-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>

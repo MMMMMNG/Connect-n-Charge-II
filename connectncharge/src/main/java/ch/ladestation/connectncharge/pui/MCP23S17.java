@@ -1442,7 +1442,7 @@ public final class MCP23S17 extends Component {
             } while (interrupts[0].state().isLow() && i < 100);
 
             if (i > 1) {
-                firstIC.logInfo("read " + i + " times to clear interrupt.");
+                firstIC.log.warn("read {} times to clear interrupt.", i);
             }
         });
 
@@ -1464,7 +1464,7 @@ public final class MCP23S17 extends Component {
                     ++j;
                 } while (interrupt.state().isLow() && j < 100);
                 if (j > 1) {
-                    currentIC.logInfo("read " + j + " times to clear interrupt.");
+                    currentIC.log.warn("read {} times to clear interrupt.", j);
                 }
             });
         }

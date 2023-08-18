@@ -56,10 +56,6 @@ public abstract class Segment extends Component {
         return endIndex;
     }
 
-    public void log(String msg) {
-        logInfo(msg);
-    }
-
     public void setColor(Color color) {
         this.color = color;
     }

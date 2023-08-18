@@ -133,24 +133,31 @@ public class GamePUITest extends ComponentTest {
         //test first and last edge
     void testModelToLEDStripBinding(int segmentIndex) {
         //given
+        log.debug("given testModelToLEDStripBinding(segmentIndex={})", segmentIndex);
         var model = new Game();
         var controller = new ApplicationController(model);
         controller.setGameStarted(true);
+        controller.awaitCompletion(); //what the heck? why is this so flipping inconsistent?
         var mockLedStrip = mock(Ws281xLedStrip.class);
         GamePUI pui = new GamePUI(controller, this.pi4j, mockLedStrip);
         var inOrder = inOrder(mockLedStrip);
 
         var theEdge = (Edge) pui.lookUpSegmentIdToSegment(segmentIndex);
         var numPixels = theEdge.getEndIndex() - theEdge.getStartIndex() + 1;
+        log.debug("when controller.edgePressed(theEdge={});", segmentIndex);
         controller.edgePressed(theEdge);
-
+        log.debug("controller.awaitCompletion()");
         controller.awaitCompletion();
         var mutex = new Semaphore(1);
         try {
             mutex.acquire();
-            pui.runLater(v -> mutex.release());
-
+            controller.runLater(v -> mutex.release());
             mutex.acquire();
+            pui.runLater(v -> mutex.release());
+            log.debug("final acquire() in testModelToLEDStripBinding(segmentIndex={})", segmentIndex);
+            mutex.acquire();
+            log.debug("try and verify in testModelToLEDStripBinding(segmentIndex={})", segmentIndex);
+
             inOrder.verify(mockLedStrip, times(numPixels)).setPixel(anyInt(), eq(theEdge.getColor()));
             inOrder.verify(mockLedStrip).render();
         } catch (InterruptedException e) {

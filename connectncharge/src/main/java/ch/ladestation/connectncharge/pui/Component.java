@@ -1,6 +1,7 @@
 package ch.ladestation.connectncharge.pui;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -10,23 +11,7 @@ public abstract class Component {
     /**
      * Logger instance
      */
-    private final Logger logger = Logger.getLogger(getClass().getName());
-
-    protected void logInfo(String msg) {
-        logger.info(() -> msg);
-    }
-
-    protected void logError(String msg) {
-        logger.severe(() -> msg);
-    }
-
-    protected void logConfig(String msg) {
-        logger.config(() -> msg);
-    }
-
-    protected void logDebug(String msg) {
-        logger.fine(() -> msg);
-    }
+    protected final Logger log = LoggerFactory.getLogger(getClass().getName());
 
     /**
      * Utility function to sleep for the specified amount of milliseconds.

@@ -67,6 +67,7 @@ public class GamePageController implements ViewMixin<Game, ControllerBase<Game>>
     public void setController(ApplicationController controller) {
         init(controller);
         this.controller = controller;
+        MyTimer.setController(controller);
     }
 
     /**
@@ -170,12 +171,6 @@ public class GamePageController implements ViewMixin<Game, ControllerBase<Game>>
 
     private void endGame() {
         MyTimer.stop();
-        saveEndTime();
-    }
-
-    private void saveEndTime() {
-        publicEndTime = timerLabel.getText().replaceAll("Zeit: ", "");
-        controller.setEndTime(publicEndTime);
     }
 
     @FXML

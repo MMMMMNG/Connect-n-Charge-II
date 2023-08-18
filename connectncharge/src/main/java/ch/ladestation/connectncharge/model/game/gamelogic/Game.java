@@ -2,6 +2,8 @@ package ch.ladestation.connectncharge.model.game.gamelogic;
 
 import ch.ladestation.connectncharge.util.mvcbase.ObservableArray;
 import ch.ladestation.connectncharge.util.mvcbase.ObservableValue;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 
 public class Game {
@@ -20,7 +22,7 @@ public class Game {
     public final ObservableValue<Boolean> isEdgeBlinking = new ObservableValue<>(true);
     public final ObservableValue<Boolean> isTippOn = new ObservableValue<>(false);
 
-    public ObservableValue<String> endTime = new ObservableValue<>("");
+    public StringProperty endTime = new SimpleStringProperty("");
     public final ObservableValue<Boolean> hasCycle = new ObservableValue<>(false);
     public final ObservableValue<Hint> activeHint = new ObservableValue<>(Hint.HINT_EMPTY_HINT);
     public final ObservableArray<Hint> activeHints = new ObservableArray<>(new Hint[0]);

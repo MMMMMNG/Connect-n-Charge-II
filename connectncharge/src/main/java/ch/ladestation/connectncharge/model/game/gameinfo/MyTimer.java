@@ -1,5 +1,6 @@
 package ch.ladestation.connectncharge.model.game.gameinfo;
 
+import ch.ladestation.connectncharge.controller.ApplicationController;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,6 +18,7 @@ public final class MyTimer {
     private static int additionalTime = 0;
     private static Timer timer;
     private static Label timerLabel;
+    private static ApplicationController controller;
 
     private MyTimer() {
         throw new AssertionError();
@@ -32,7 +34,8 @@ public final class MyTimer {
                         secondsElapsed++;
                         // Perform any desired actions based on the elapsed time
                         Platform.runLater(() -> {
-                            timerLabel.setText("Zeit: " + timeFormat(secondsElapsed));
+                            controller.setEndTime(timeFormat(secondsElapsed));
+                            timerLabel.setText("Zeit: " + controller.getModel().endTime.get());
                         });
                     }
                 }
@@ -48,6 +51,10 @@ public final class MyTimer {
         MyTimer.secondsElapsed = 0;
         MyTimer.isTimerRunning = false;
         MyTimer.additionalTime = 0;
+    }
+
+    public static void setController(ApplicationController controller) {
+        MyTimer.controller = controller;
     }
 
     public static void setTimerLabel(Label timerLabel) {

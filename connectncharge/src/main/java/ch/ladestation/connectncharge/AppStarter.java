@@ -5,6 +5,7 @@ import ch.ladestation.connectncharge.controller.pagecontroller.StageHandler;
 import ch.ladestation.connectncharge.model.game.gamelogic.Game;
 import ch.ladestation.connectncharge.model.text.FilePath;
 import ch.ladestation.connectncharge.pui.GamePUI;
+import ch.ladestation.connectncharge.pui.Sounder;
 import ch.ladestation.connectncharge.util.Pi4JContext;
 import ch.ladestation.connectncharge.util.mvcbase.MvcLogger;
 import com.pi4j.context.Context;
@@ -22,7 +23,7 @@ public class AppStarter extends Application {
 
     public static void main(String[] args) {
         Context pi4J = Pi4JContext.createContext();
-
+        Sounder.init();
         controller = new ApplicationController(new Game());
         var gPUI = new GamePUI(controller, pi4J);
 

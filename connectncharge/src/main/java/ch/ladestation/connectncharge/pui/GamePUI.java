@@ -16,19 +16,23 @@ import com.pi4j.io.gpio.digital.DigitalInput;
 import com.pi4j.io.gpio.digital.PullResistance;
 import com.pi4j.io.spi.Spi;
 import com.pi4j.io.spi.SpiBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Logger;
 
 public class GamePUI extends PuiBase<Game, ApplicationController> {
 
     /**
      * Logger instance
      */
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger LOG = LoggerFactory.getLogger(GamePUI.class);
+    public static final String DEBUG_MSG_REACT_TO_ARR_CHANGE =
+        "reacting to change of {}; oldValue.length={} newValue.length={}";
+    public static final String DEBUG_MSG_REACT_TO_CHANGE =
+        "reacting to change of {}; oldValue={} newValue={}";
     private final String hOUSEFLAG = "H";
-
     private List<MCP23S17> chips;
     private LedStrip ledStrip;
 
@@ -102,6 +106,7 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
     public void setupOwnModelToUiBindings(Game model) {
         onChangeOf(model.activatedEdges).execute(((oldValue, newValue) -> {
             synchronized (ledStrip) {
+                LOG.debug(DEBUG_MSG_REACT_TO_ARR_CHANGE, "Game.activatedEdges", oldValue.length, newValue.length);
                 changeMultipleLEDSegmentState(oldValue, false);
                 changeMultipleLEDSegmentState(newValue, true);
                 ledStrip.render();
@@ -110,6 +115,7 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
 
         onChangeOf(model.terminals).execute(((oldValue, newValue) -> {
             synchronized (ledStrip) {
+                LOG.debug(DEBUG_MSG_REACT_TO_ARR_CHANGE, "Game.terminals", oldValue.length, newValue.length);
                 changeMultipleLEDSegmentState(oldValue, false);
                 changeMultipleLEDSegmentState(newValue, true);
                 ledStrip.render();
@@ -118,6 +124,7 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
 
         onChangeOf(model.isEdgeBlinking).execute((oldValue, newValue) -> {
             synchronized (ledStrip) {
+                LOG.debug(DEBUG_MSG_REACT_TO_CHANGE, "Game.isEdgeBlinking", oldValue, newValue);
                 changeLEDSegmentState(model.blinkingEdge, newValue);
                 ledStrip.render();
             }
@@ -125,6 +132,7 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
 
         onChangeOf(model.isTippOn).execute((oldValue, newValue) -> {
             synchronized (ledStrip) {
+                LOG.debug(DEBUG_MSG_REACT_TO_CHANGE, "Game.isTippOn", oldValue, newValue);
                 changeLEDSegmentState(model.tippEdge, newValue);
                 ledStrip.render();
             }
@@ -190,11 +198,11 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
      * @param edge the instance that represents the pressed edge
      */
     private void handleEdgePressed(Edge edge, ApplicationController controller) {
+        LOG.info("edge {} between {} & {} was pressed",
+            edge.getSegmentIndex(),
+            edge.getFromNodeId(),
+            edge.getToNodeId());
         controller.edgePressed(edge);
-        //controller.updateScore();
-        logger.info("edge " + edge.getSegmentIndex() + " between " + edge.getFromNodeId() + " & "
-            + edge.getToNodeId()
-            + " was pressed");
     }
 
     /**

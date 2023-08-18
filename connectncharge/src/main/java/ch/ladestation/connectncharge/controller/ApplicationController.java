@@ -5,6 +5,7 @@ import ch.ladestation.connectncharge.model.game.gamelogic.Game;
 import ch.ladestation.connectncharge.model.game.gamelogic.Hint;
 import ch.ladestation.connectncharge.model.game.gamelogic.Node;
 import ch.ladestation.connectncharge.pui.GamePUI;
+import ch.ladestation.connectncharge.pui.Sounder;
 import ch.ladestation.connectncharge.services.file.TextFileEditor;
 import ch.ladestation.connectncharge.util.mvcbase.ControllerBase;
 import com.github.mbelling.ws281x.Color;
@@ -14,7 +15,6 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 /**
@@ -22,7 +22,6 @@ import java.util.stream.Stream;
  */
 public class ApplicationController extends ControllerBase<Game> {
     private static final int MAX_LEVEL = 5;
-    private final Logger logger = Logger.getLogger(getClass().getName());
     public boolean firstBootup = true;
     private Map<Integer, List<Object>> levels;
     private int currentLevel = 1;
@@ -96,10 +95,6 @@ public class ApplicationController extends ControllerBase<Game> {
             } else {
                 setValue(model.activeHint, Hint.HINT_EMPTY_HINT);
             }
-        });
-
-        model.endTime.onChange((oldValue, newValue) -> {
-            System.out.println("model.endTime: " + model.endTime);
         });
     }
 
@@ -283,8 +278,10 @@ public class ApplicationController extends ControllerBase<Game> {
         if (edge != null) {
             if (!edge.isOn()) {
                 activateEdge(edge);
+                Sounder.playActivate();
             } else {
                 deactivateEdge(edge);
+                Sounder.playDeactivate();
             }
         }
     }
@@ -489,7 +486,8 @@ public class ApplicationController extends ControllerBase<Game> {
     }
 
     public void setEndTime(String endTime) {
-        setValue(model.endTime, endTime);
+        model.endTime.set(endTime);
+        System.out.println(model.endTime.get());
     }
 
     public void addHint(Hint hint) {

@@ -8,7 +8,10 @@ Connect 'n Charge ist ein strategisches Brettspiel, bei dem die Spieler dazu auf
 Die Spieler übernehmen die Rolle des Managers einer idyllischen Feriensiedlung mit 30 Ferienhäusern, die dazu beitragen sollen, umweltfreundliche Mobilität zu fördern, indem 13 Häuser mit modernen E-Ladestationen ausgestattet werden.
 Die Herausforderung liegt dabei in der optimalen Nutzung von Ressourcen und der Schaffung eines effizienten Verteilungsnetzes.
 
-![example workflow](https://github.com/fhnw-sgi-ip12-22vt/ip12-22vt_ladestationen/actions/workflows/maven.yml/badge.svg)
+
+![workflow badge](https://github.com/fhnw-sgi-ip12-22vt/ip12-22vt_ladestationen/actions/workflows/maven.yml/badge.svg)
+![coverage badge](https://fhnw-sgi-ip12-22vt.github.io/ip12-22vt_ladestationen/jacoco.svg)
+
 Check out the latest [JavaDoc](https://fhnw-sgi-ip12-22vt.github.io/ip12-22vt_ladestationen/apidocs/ch.ladestation.connectncharge/module-summary.html) on our [Project Pages](https://fhnw-sgi-ip12-22vt.github.io/ip12-22vt_ladestationen/)
 
 ## Setup in IntelliJ IDEA

@@ -1,23 +1,24 @@
 package ch.ladestation.connectncharge.util.mvcbase;
 
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public final class MvcLogger {
-    private final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private final Logger logger = LoggerFactory.getLogger(MvcLogger.class);
 
     public void logInfo(String msg) {
-        logger.info(() -> msg);
+        logger.info(msg);
     }
 
     public void logError(String msg) {
-        logger.severe(() -> msg);
+        logger.error(msg);
     }
 
     public void logConfig(String msg) {
-        logger.config(() -> msg);
+        logger.trace(msg);
     }
 
     public void logDebug(String msg) {
-        logger.fine(() -> msg);
+        logger.debug(msg);
     }
 }

@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public final class TextFileEditor {
+    private static final String DEFAULT_ADMIN_CODE = "123456";
+
     private static final MvcLogger LOGGER = new MvcLogger();
 
     private static final int NUMBER_OF_LEVELS = 5;
@@ -119,6 +121,17 @@ public final class TextFileEditor {
             }
         } catch (IOException e) {
             LOGGER.logError("An error has occurred while writing the player file. " + e);
+        }
+    }
+
+    public static String getAdminCode() {
+        InputStream adminCodeFile = TextFileEditor.class.getResourceAsStream("/textfiles/code/Code.txt");
+
+        try {
+            List<String> adminCode = readFile(adminCodeFile);
+            return adminCode.get(0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

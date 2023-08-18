@@ -1,7 +1,6 @@
 package ch.ladestation.connectncharge.util;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
@@ -22,6 +21,8 @@ import com.pi4j.plugin.pigpio.provider.pwm.PiGpioPwmProvider;
 import com.pi4j.plugin.pigpio.provider.serial.PiGpioSerialProvider;
 import com.pi4j.plugin.pigpio.provider.spi.PiGpioSpiProvider;
 import com.pi4j.plugin.raspberrypi.platform.RaspberryPiPlatform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -33,7 +34,7 @@ import com.pi4j.plugin.raspberrypi.platform.RaspberryPiPlatform;
  */
 public final class Pi4JContext {
 
-    private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Pi4JContext.class);
 
     private Pi4JContext() {
     }
@@ -45,7 +46,7 @@ public final class Pi4JContext {
      */
     public static Context createContext() {
         Context context = runsOnPi() ? createRaspPiContext() : createMockContext();
-        LOGGER.info(() -> "GPIO initialized for %s".formatted((runsOnPi() ? "RaspPi" : "desktop")));
+        LOGGER.info("GPIO initialized for {}", runsOnPi() ? "RaspPi" : "desktop");
 
         return context;
     }

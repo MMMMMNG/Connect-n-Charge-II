@@ -18,9 +18,7 @@ env:
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
@@ -38,7 +36,14 @@ jobs:
     - name: Build with Maven
       run: mvn package $MAVEN_CLI_OPTS
     - name: Generate Project Pages
-      run: mvn site $MAVEN_CLI_OPTS 
+      run: mvn site $MAVEN_CLI_OPTS
+    - name: jacoco-badge-generator
+      uses: cicirello/jacoco-badge-generator@v2.9.0
+      with:
+        # The directory for storing badges, relative to the root of the repository.
+        badges-directory: connectncharge/target/site
+        jacoco-csv-file: connectncharge/target/site/jacoco/jacoco.csv
+ 
     - name: Upload GitHub Pages artifact
       uses: actions/upload-pages-artifact@v1.0.8
       with:
