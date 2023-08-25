@@ -48,7 +48,6 @@ public class AppStarter extends Application {
     public void start(Stage stage) throws IOException {
         StageHandler.setStage(stage);
         StageHandler.setController(controller);
-        //StageHandler.setController(new ApplicationController(new Game()));
         StageHandler.openStage(FilePath.LOADINGPAGE.getFilePath());
     }
 }
