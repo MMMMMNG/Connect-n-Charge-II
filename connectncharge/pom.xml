@@ -518,6 +518,14 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>ch/ladestation/connectncharge/controller/pagecontroller/**</exclude>
+                        <exclude>com/github/mbelling/ws281x/**</exclude>
+                        <exclude>ch/ladestation/connectncharge/pui/MCP23S17**</exclude>
+                        <exclude>ch/ladestation/connectncharge/util/**</exclude>
+                    </excludes>
+                </configuration>
                 <reportSets>
                     <reportSet>
                         <reports>
