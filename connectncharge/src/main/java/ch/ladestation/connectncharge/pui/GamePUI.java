@@ -24,14 +24,14 @@ import java.util.*;
 
 public class GamePUI extends PuiBase<Game, ApplicationController> {
 
-    /**
-     * Logger instance
-     */
-    private static final Logger LOG = LoggerFactory.getLogger(GamePUI.class);
     public static final String DEBUG_MSG_REACT_TO_ARR_CHANGE =
         "reacting to change of {}; oldValue.length={} newValue.length={}";
     public static final String DEBUG_MSG_REACT_TO_CHANGE =
         "reacting to change of {}; oldValue={} newValue={}";
+    /**
+     * Logger instance
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(GamePUI.class);
     private final String hOUSEFLAG = "H";
     private List<MCP23S17> chips;
     private LedStrip ledStrip;
@@ -101,6 +101,7 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
 
     /**
      * This method binds the model reactively to the ledstrips.
+     *
      * @param model
      */
     public void setupOwnModelToUiBindings(Game model) {
@@ -317,7 +318,11 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
 
     public Edge lookUpEdge(int fromIndex, int toIndex) {
         return edges.stream().filter(e -> (e.getFromNodeId() == fromIndex && e.getToNodeId() == toIndex)
-            || (e.getFromNodeId() == toIndex && e.getToNodeId() == fromIndex)).findFirst().orElse(null);
+            || (e.getFromNodeId() == toIndex && e.getToNodeId() == fromIndex)).findFirst().orElseThrow();
+    }
+
+    public List<Edge> getAllEdges() {
+        return edges;
     }
 }
 
