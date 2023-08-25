@@ -10,7 +10,6 @@ import ch.ladestation.connectncharge.services.file.TextFileEditor;
 import ch.ladestation.connectncharge.util.mvcbase.ControllerBase;
 import com.github.mbelling.ws281x.Color;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,7 +20,7 @@ import java.util.stream.Stream;
  * This Class is the controller of the element with the components.
  */
 public class ApplicationController extends ControllerBase<Game> {
-    private static final int MAX_LEVEL = 5;
+    public static final int MAX_LEVEL = 5;
     public boolean firstBootup = true;
     private Map<Integer, List<Object>> levels;
     private int currentLevel = 1;
@@ -89,21 +88,17 @@ public class ApplicationController extends ControllerBase<Game> {
         }));
 
         model.activeHints.onChange((oldValue, newValue) -> {
+            log.trace("almost what I need: but length={}", model.activeHints.getValues().length);
             if (!Arrays.stream(model.activeHints.getValues()).toList().isEmpty()) {
                 setValue(model.activeHint,
-                    Arrays.stream(model.activeHints.getValues()).min(Comparator.comparingInt(Hint::getPriority)).get());
+                    Arrays.stream(model.activeHints.getValues())
+                        .min(Comparator.comparingInt(Hint::getPriority))
+                        .get());
             } else {
+                log.trace("that's what I need. scheduling empty hint");
                 setValue(model.activeHint, Hint.HINT_EMPTY_HINT);
             }
         });
-    }
-
-    private void startIgnoringInputs() {
-        model.ignoringInputs = true;
-    }
-
-    private void stopIgnoringInputs() {
-        model.ignoringInputs = false;
     }
 
     /**
@@ -177,6 +172,14 @@ public class ApplicationController extends ControllerBase<Game> {
         return false;
     }
 
+    private void startIgnoringInputs() {
+        model.ignoringInputs = true;
+    }
+
+    private void stopIgnoringInputs() {
+        model.ignoringInputs = false;
+    }
+
     /**
      * This method is a setter for the gamePUI.
      *
@@ -190,11 +193,7 @@ public class ApplicationController extends ControllerBase<Game> {
      * This method loads all the levels from the text files in a {@code Map<Integer, List<Object>>}.
      */
     public void loadLevels() {
-        try {
-            levels = TextFileEditor.readLevels();
-        } catch (IOException ioException) {
-            throw new RuntimeException("error: levels could not be read!");
-        }
+        levels = TextFileEditor.readLevels();
     }
 
     /**
@@ -287,7 +286,6 @@ public class ApplicationController extends ControllerBase<Game> {
     }
 
     private void activateEdge(Edge edge) {
-        edge.on();
         Edge[] oldValues = model.activatedEdges.getValues();
         Edge[] newValues = new Edge[oldValues.length + 1];
         System.arraycopy(oldValues, 0, newValues, 0, oldValues.length);
@@ -296,9 +294,8 @@ public class ApplicationController extends ControllerBase<Game> {
     }
 
     private void deactivateEdge(Edge edge) {
-        edge.off();
         Edge[] oldValues = model.activatedEdges.getValues();
-        Edge[] newValues = Arrays.stream(oldValues).filter(curr -> curr != edge).toArray(Edge[]::new);
+        var newValues = Arrays.stream(oldValues).filter(curr -> curr != edge).toArray(Edge[]::new);
         setValues(model.activatedEdges, newValues);
     }
 
@@ -340,11 +337,7 @@ public class ApplicationController extends ControllerBase<Game> {
 
         if (allTerminalsConnected()) {
             if (score <= solutionScore) {
-                try {
-                    finishGame();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                finishGame();
             } else {
                 addHint(Hint.HINT_SOLUTION_NOT_FOUND);
             }
@@ -425,7 +418,8 @@ public class ApplicationController extends ControllerBase<Game> {
         List<Edge> edgesToRemove;
 
         edgesToSelect = Arrays.stream(model.solution.getValues())
-            .filter(solEdge -> !Arrays.stream(model.activatedEdges.getValues()).toList().contains(solEdge)).toList();
+            .filter(solEdge -> !Arrays.stream(model.activatedEdges.getValues())
+                .toList().contains(solEdge)).toList();
 
         edgesToRemove = Arrays.stream(model.activatedEdges.getValues())
             .filter((activatedEdge) -> !Arrays.stream(model.solution.getValues()).toList().contains(activatedEdge))
@@ -446,7 +440,7 @@ public class ApplicationController extends ControllerBase<Game> {
 
     public void setTippEdge(Edge edge) {
         model.tippEdge = edge;
-        model.tippEdge.setColor(isToBeRemoved ? Color.RED : Color.ORANGE);
+        model.tippEdge.setColor(isToBeRemoved ? Hint.HINT_REMOVE_EDGE.getColor() : Hint.HINT_PICK_EDGE.getColor());
         setValue(model.isTippOn, true);
     }
 
@@ -464,7 +458,7 @@ public class ApplicationController extends ControllerBase<Game> {
         }
     }
 
-    public void finishGame() throws IOException {
+    public void finishGame() {
         setValue(model.isFinished, true);
     }
 
@@ -496,6 +490,7 @@ public class ApplicationController extends ControllerBase<Game> {
             Hint[] newValues = new Hint[oldValues.length + 1];
             System.arraycopy(oldValues, 0, newValues, 0, oldValues.length);
             newValues[newValues.length - 1] = hint;
+            log.trace("scheduled new Hint add: {}, length={}", hint, newValues.length);
             setValues(model.activeHints, newValues);
         }
     }
@@ -505,6 +500,7 @@ public class ApplicationController extends ControllerBase<Game> {
             Hint[] oldValues = model.activeHints.getValues();
             Hint[] newValues = Arrays.stream(oldValues).filter(curr -> curr != hint).toArray(Hint[]::new);
             setValues(model.activeHints, newValues);
+            log.trace("scheduled: {}, length={}", hint, newValues.length);
         }
     }
 }
