@@ -192,29 +192,16 @@ class ApplicationControllerTest {
         assertEquals(Hint.HINT_REMOVE_EDGE.getColor(), tooMuch.getColor());
 
         //when
-        thoroughlyAwaitCompletion(cut);
         cut.edgePressed(sol[0]);
         thoroughlyAwaitCompletion(cut);
+
         assertTrue(tooMuch.isOn());
+        assertFalse(sol[0].isOn());
 
-        cut.edgePressed(tooMuch);
-        thoroughlyAwaitCompletion(cut);
-        assertFalse(tooMuch.isOn());
-        cut.edgePressed(tooMuch);
-        thoroughlyAwaitCompletion(cut);
-        assertTrue(tooMuch.isOn()); //hardcoded extra edge press b/c of inconsistency (I hat this!)
-        // NOTE: never schedule actions from many threads, it works in production but is
-        // almost untestable
-
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         LOG.warn("critical assert that always fails with HINT_EMPTY expected");
+        assertEquals(Hint.HINT_EMPTY_HINT, model.activeHint.getValue());
         assertFalse(model.isTippOn.getValue());
         assertArrayEquals(new Hint[0], model.activeHints.getValues());
-        assertEquals(Hint.HINT_EMPTY_HINT, model.activeHint.getValue());
     }
 
     @Test

@@ -485,22 +485,12 @@ public class ApplicationController extends ControllerBase<Game> {
     }
 
     public void addHint(Hint hint) {
-        if (!Arrays.stream(model.activeHints.getValues()).toList().contains(hint)) {
-            Hint[] oldValues = model.activeHints.getValues();
-            Hint[] newValues = new Hint[oldValues.length + 1];
-            System.arraycopy(oldValues, 0, newValues, 0, oldValues.length);
-            newValues[newValues.length - 1] = hint;
-            log.trace("scheduled new Hint add: {}, length={}", hint, newValues.length);
-            setValues(model.activeHints, newValues);
-        }
+        addUnique(model.activeHints, hint);
+        log.trace("scheduled new Hint add: {}", hint);
     }
 
-    public void removeHint(Hint hint) {
-        if (Arrays.stream(model.activeHints.getValues()).toList().contains(hint)) {
-            Hint[] oldValues = model.activeHints.getValues();
-            Hint[] newValues = Arrays.stream(oldValues).filter(curr -> curr != hint).toArray(Hint[]::new);
-            setValues(model.activeHints, newValues);
-            log.trace("scheduled: {}, length={}", hint, newValues.length);
-        }
+    public synchronized void removeHint(Hint hint) {
+        remove(model.activeHints, hint);
+        log.trace("remove scheduled: {}", hint);
     }
 }
