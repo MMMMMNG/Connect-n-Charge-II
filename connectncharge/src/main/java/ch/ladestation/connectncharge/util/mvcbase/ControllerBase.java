@@ -3,12 +3,15 @@ package ch.ladestation.connectncharge.util.mvcbase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Array;
 import java.time.Duration;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
 /**
@@ -41,6 +44,20 @@ public abstract class ControllerBase<M> {
         this.model = model;
     }
 
+    public static <V> V[] arrayRemove(V[] theArray, V toRemove) {
+        final var clazz = theArray.getClass().getComponentType();
+        IntFunction<V[]> generator = length -> (V[]) Array.newInstance(clazz, length);
+        return Arrays.stream(theArray).filter(e -> !e.equals(toRemove)).toArray(generator);
+    }
+
+    public static <V> V[] arrayAdd(V[] theArray, V toAdd) {
+        var length = theArray.length;
+        V[] newArr = (V[]) Array.newInstance(theArray.getClass().getComponentType(), length + 1);
+        System.arraycopy(theArray, 0, newArr, 0, length);
+        newArr[length] = toAdd;
+        return newArr;
+    }
+
     public void shutdown() {
         if (null != actionQueue) {
             actionQueue.shutdown();
@@ -67,7 +84,6 @@ public abstract class ControllerBase<M> {
         }
         actionQueue.submit(action, onDone);
     }
-
 
     /**
      * Schedule the given action for execution in strict order in external thread, asynchronously.
@@ -104,7 +120,7 @@ public abstract class ControllerBase<M> {
 
         CountDownLatch latch = new CountDownLatch(1);
         log.trace("starting await completion {}", this.hashCode());
-        async(() -> null, v -> latch.countDown());
+        runLater(m -> latch.countDown());
         try {
             //noinspection ResultOfMethodCallIgnored
             latch.await(5, TimeUnit.SECONDS);
@@ -213,6 +229,45 @@ public abstract class ControllerBase<M> {
     }
 
     /**
+     * Convenience method to remove an element from an {@code ObservableArray<V>}
+     *
+     * @param observableArray the array that will be affected
+     * @param elementToRemove the element to remove
+     * @param <V>             the type of the array and element
+     */
+    protected <V> void remove(ObservableArray<V> observableArray, V elementToRemove) {
+        async(() -> observableArray.setValues(arrayRemove(get(observableArray), elementToRemove)));
+    }
+
+    /**
+     * Convenience method to add an element to an {@code ObservableArray<V>}
+     *
+     * @param observableArray the array that will be affected
+     * @param elementToAdd    the element to add
+     * @param <V>             the type of the array and element
+     */
+    protected <V> void add(ObservableArray<V> observableArray, V elementToAdd) {
+        async(() -> observableArray.setValues(arrayAdd(observableArray.getValues(), elementToAdd)));
+    }
+
+    /**
+     * Convenience method to add an element to an {@code ObservableArray<V>} but
+     * only if the array doesn't already contain that element
+     *
+     * @param observableArray the array that will be affected
+     * @param elementToAdd    the element to add
+     * @param <V>             the type of the array and element
+     */
+    protected <V> void addUnique(ObservableArray<V> observableArray, V elementToAdd) {
+        async(() -> {
+            V[] vals = observableArray.getValues();
+            if (!Arrays.asList(vals).contains(elementToAdd)) {
+                observableArray.setValues(arrayAdd(vals, elementToAdd));
+            }
+        });
+    }
+
+    /**
      * Utility function to pause execution of actions for the specified amount of time.
      * <p>
      * An {@link InterruptedException} will be catched and ignored while setting the interrupt flag again.
@@ -243,7 +298,7 @@ public abstract class ControllerBase<M> {
     }
 
     protected <V> Setter<V> set(ObservableValue<V> observableValue, V value) {
-        return new Setter<V>(observableValue, () -> value);
+        return new Setter<>(observableValue, () -> value);
     }
 
     protected Setter<Integer> increase(ObservableValue<Integer> observableValue) {
@@ -259,7 +314,7 @@ public abstract class ControllerBase<M> {
     }
 
     protected <V> ArraySetter<V> set(ObservableArray<V> observableArray, V[] values) {
-        return new ArraySetter<>(observableArray, values);
+        return new ArraySetter<>(observableArray, () -> values);
     }
 
     protected static final class Setter<V> {
@@ -280,15 +335,15 @@ public abstract class ControllerBase<M> {
 
     protected static final class ArraySetter<V> {
         private final ObservableArray<V> observableArray;
-        private final V[] values;
+        private final Supplier<V[]> valuesSupplier;
 
-        private ArraySetter(ObservableArray<V> observableArray, V[] values) {
+        private ArraySetter(ObservableArray<V> observableArray, Supplier<V[]> valuesSupplier) {
             this.observableArray = observableArray;
-            this.values = values;
+            this.valuesSupplier = valuesSupplier;
         }
 
         void setValue() {
-            observableArray.setValues(values);
+            observableArray.setValues(valuesSupplier.get());
         }
     }
 }
