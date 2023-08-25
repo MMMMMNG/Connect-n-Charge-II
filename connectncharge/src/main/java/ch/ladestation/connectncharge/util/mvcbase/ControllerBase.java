@@ -1,5 +1,8 @@
 package ch.ladestation.connectncharge.util.mvcbase;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Duration;
 
 import java.util.Objects;
@@ -22,10 +25,10 @@ import java.util.function.Supplier;
  */
 public abstract class ControllerBase<M> {
 
-    private ConcurrentTaskQueue<M> actionQueue;
-
     // the model managed by this Controller. Only subclasses have direct access
     protected final M model;
+    protected final Logger log = LoggerFactory.getLogger(getClass().getName());
+    private ConcurrentTaskQueue<M> actionQueue;
 
     /**
      * Controller needs a Model.
@@ -58,7 +61,9 @@ public abstract class ControllerBase<M> {
      */
     protected void async(Supplier<M> action, Consumer<M> onDone) {
         if (null == actionQueue) {
+            log.trace("new actionqueue");
             actionQueue = new ConcurrentTaskQueue<>();
+
         }
         actionQueue.submit(action, onDone);
     }
@@ -76,8 +81,7 @@ public abstract class ControllerBase<M> {
     }
 
     /**
-     * @param action
-     * Schedule the given action after all the actions already scheduled have finished.
+     * @param action Schedule the given action after all the actions already scheduled have finished.
      */
     public void runLater(Consumer<M> action) {
         async(() -> model, action);
@@ -94,25 +98,26 @@ public abstract class ControllerBase<M> {
      */
     public void awaitCompletion() {
         if (actionQueue == null) {
+            log.warn("awaitCompletion() was skipped cuz actionQueue is null");
             return;
         }
 
         CountDownLatch latch = new CountDownLatch(1);
-        actionQueue.submit(() -> {
-            latch.countDown();
-            return null;
-        });
+        log.trace("starting await completion {}", this.hashCode());
+        async(() -> null, v -> latch.countDown());
         try {
             //noinspection ResultOfMethodCallIgnored
             latch.await(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             throw new IllegalStateException("CountDownLatch was interrupted");
         }
+        log.trace("finished await completion {}", this.hashCode());
     }
 
     /**
      * Only the other base classes 'ViewMixin' and 'PUI_Base' need access, therefore it's 'package private'
      * ...except when trying to mock this. so nvm.
+     *
      * @return the model of this controller
      */
     public M getModel() {
@@ -127,6 +132,7 @@ public abstract class ControllerBase<M> {
      * Value is set asynchronously.
      */
     protected <V> void setValue(ObservableValue<V> observableValue, V newValue) {
+        log.trace("scheduling setValue({}, {})", observableValue.toString(), newValue);
         async(() -> observableValue.setValue(newValue));
     }
 

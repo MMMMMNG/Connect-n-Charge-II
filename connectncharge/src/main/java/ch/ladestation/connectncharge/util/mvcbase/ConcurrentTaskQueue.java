@@ -1,5 +1,8 @@
 package ch.ladestation.connectncharge.util.mvcbase;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Duration;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -26,6 +29,7 @@ import java.util.function.Supplier;
  */
 
 public final class ConcurrentTaskQueue<R> {
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final ExecutorService executor;
     private final ConcurrentLinkedQueue<Task<R>> buffer;
     private final Duration maxToDoTime;
@@ -51,38 +55,47 @@ public final class ConcurrentTaskQueue<R> {
         });
     }
 
-    public void submit(Supplier<R> todo, Consumer<R> onDone) {
-        buffer.add(new Task<>(todo, onDone));
+    public synchronized void submit(Supplier<R> todo, Consumer<R> onDone) {
+        var task = new Task<>(todo, onDone);
+        buffer.add(task);
+        log.trace("just submitted task={}", task.hashCode());
         execute();
     }
 
-    private void execute() {
+    private synchronized void execute() {
+        log.trace("starting execute, running={}, size={}", running, buffer.size());
+        final Task<R> task;
         if (running) {
+            log.trace("stopping execute, cuz running={} (must've been true)", running);
             return;
         }
-
-        final Task<R> task = buffer.poll();
-
+        task = buffer.poll();
+        log.trace("grabby grabby from the queue, task={} size={}",
+            task != null ? task.hashCode() : "null", buffer.size());
         if (task == null) {
+            log.trace("returning 'cuz queue is empty");
             return;
         }
-
+        log.trace("setting running={} to true", running);
         running = true;
-
         final Future<R> todoFuture = executor.submit(task.todo::get);
+        log.trace("submitted todo for task={}", task.hashCode());
 
         Runnable onDoneRunnable = () -> {
             try {
                 final R r = todoFuture.get(maxToDoTime.getSeconds(), TimeUnit.SECONDS);
                 task.onDone.accept(r);
             } catch (Exception e) {
+                log.warn("exception caught handling task={}: {}", task.hashCode(), e.getMessage());
                 e.printStackTrace(); // todo: think about better exception handling
             } finally {
+                log.trace("done with task={}, setting running={} to false", task.hashCode(), running);
                 running = false;
                 execute();
             }
         };
         executor.submit(onDoneRunnable);
+        log.trace("submitted onDoneRunnable for task={}", task.hashCode());
     }
 
     private static class Task<T> {
