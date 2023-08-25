@@ -8,7 +8,7 @@ public enum Hint {
     HINT_NOT_ALL_NODES_CONNECTED("Du hast noch nicht alle Häuser miteinander verbunden.", Color.GRAY, 0),
 
     HINT_PICK_EDGE("Diese orange leuchtende Kante ist in der Lösung enthalten.", Color.ORANGE, 1),
-    HINT_REMOVE_EDGE("Diese rote leuchtende Kante ist nicht in der Lösung enthalten.", Color.GRAY, 1),
+    HINT_REMOVE_EDGE("Diese rote leuchtende Kante ist nicht in der Lösung enthalten.", Color.RED, 1),
     HINT_CYCLE("Du hast ein Kreis gebildet.\n"
         + "Das heisst, dass dadurch mindestens eine dieser Kanten überflüssig ist und du diese entfernen kannst.",
         Color.RED, 2),
