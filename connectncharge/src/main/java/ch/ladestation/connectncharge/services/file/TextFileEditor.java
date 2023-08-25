@@ -17,7 +17,7 @@ public final class TextFileEditor {
     private TextFileEditor() {
     }
 
-    public static Map<Integer, List<Object>> readLevels() throws IOException {
+    public static Map<Integer, List<Object>> readLevels() {
         Map<Integer, List<Object>> levels = new HashMap<>();
 
         for (int i = 1; i < NUMBER_OF_LEVELS + 1; i++) {
@@ -51,7 +51,7 @@ public final class TextFileEditor {
         return levels;
     }
 
-    private static List<String> readFile(InputStream filePath) throws IOException {
+    private static List<String> readFile(InputStream filePath) {
         List<String> lines = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(filePath, StandardCharsets.UTF_8))) {
@@ -59,6 +59,8 @@ public final class TextFileEditor {
             while ((line = reader.readLine()) != null) {
                 lines.add(line);
             }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
         return lines;
     }
@@ -127,11 +129,7 @@ public final class TextFileEditor {
     public static String getAdminCode() {
         InputStream adminCodeFile = TextFileEditor.class.getResourceAsStream("/textfiles/code/Code.txt");
 
-        try {
-            List<String> adminCode = readFile(adminCodeFile);
-            return adminCode.get(0);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        List<String> adminCode = readFile(adminCodeFile);
+        return adminCode.get(0);
     }
 }
