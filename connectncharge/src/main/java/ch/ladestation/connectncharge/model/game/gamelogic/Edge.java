@@ -34,15 +34,20 @@ public class Edge extends Segment {
         return fromNode;
     }
 
-    public Node getToNode() {
-        return toNode;
-    }
-
     public void setFromNode(Node fromNode) {
         this.fromNode = fromNode;
     }
 
+    public Node getToNode() {
+        return toNode;
+    }
+
     public void setToNode(Node toNode) {
         this.toNode = toNode;
+    }
+
+    @Override
+    public String toString() {
+        return getFromNodeId() + "<-" + getSegmentIndex() + "->" + getToNodeId();
     }
 }

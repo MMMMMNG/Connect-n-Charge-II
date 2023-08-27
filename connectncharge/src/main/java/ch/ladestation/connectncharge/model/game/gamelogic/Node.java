@@ -7,4 +7,9 @@ public class Node extends Segment {
         super(index, startIndex, endIndex, Color.BLUE);
 
     }
+
+    @Override
+    public String toString() {
+        return "(" + getSegmentIndex() + ")";
+    }
 }

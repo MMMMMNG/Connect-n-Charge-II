@@ -4,10 +4,15 @@ import ch.ladestation.connectncharge.util.mvcbase.ObservableArray;
 import ch.ladestation.connectncharge.util.mvcbase.ObservableValue;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Game {
     public static final String HOUSE_FLAG = "H";
+    public static final int MAX_LEVEL = 5;
+    private static final Logger LOG = LoggerFactory.getLogger(Game.class);
+    private static final String LOG_MSG_OBSERVABLE_VAL_CHANGED = "{} changed from {} to {}";
     public final ObservableArray<Edge> solution = new ObservableArray<>(new Edge[0]);
     public final ObservableArray<Edge> activatedEdges = new ObservableArray<>(new Edge[0]);
     public final ObservableArray<Node> terminals = new ObservableArray<>(new Node[0]);
@@ -38,5 +43,26 @@ public class Game {
                 ed.on();
             }
         });
+
+        setupLogging(solution, "solution");
+        setupLogging(activatedEdges, "activatedEdges");
+        setupLogging(terminals, "terminals");
+        setupLogging(currentScore, "currentScore");
+        setupLogging(gameStarted, "gameStarted");
+        setupLogging(isFinished, "isFinished");
+        setupLogging(isCountdownFinished, "isCountdownFinished");
+        setupLogging(isEdgeBlinking, "isEdgeBlinking");
+        setupLogging(isTippOn, "isTippOn");
+        setupLogging(hasCycle, "hasCycle");
+        setupLogging(activeHint, "activeHint");
+        setupLogging(activeHints, "activeHints");
+    }
+
+    private static void setupLogging(ObservableValue<?> val, String name) {
+        val.onChange((oldV, newV) -> LOG.info(LOG_MSG_OBSERVABLE_VAL_CHANGED, name, oldV, newV));
+    }
+
+    private static void setupLogging(ObservableArray<?> val, String name) {
+        val.onChange((oldV, newV) -> LOG.info(LOG_MSG_OBSERVABLE_VAL_CHANGED, name, oldV, newV));
     }
 }
