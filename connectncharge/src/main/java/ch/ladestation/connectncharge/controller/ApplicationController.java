@@ -8,6 +8,7 @@ import ch.ladestation.connectncharge.pui.GamePUI;
 import ch.ladestation.connectncharge.pui.Sounder;
 import ch.ladestation.connectncharge.services.file.TextFileEditor;
 import ch.ladestation.connectncharge.util.mvcbase.ControllerBase;
+import ch.ladestation.connectncharge.util.mvcbase.ObservableArray;
 import com.github.mbelling.ws281x.Color;
 
 import java.util.*;
@@ -20,7 +21,6 @@ import java.util.stream.Stream;
  * This Class is the controller of the element with the components.
  */
 public class ApplicationController extends ControllerBase<Game> {
-    public static final int MAX_LEVEL = 5;
     public boolean firstBootup = true;
     private Map<Integer, List<Object>> levels;
     private int currentLevel = 1;
@@ -41,10 +41,10 @@ public class ApplicationController extends ControllerBase<Game> {
                 return;
             }
 
-            updateScore(Arrays.stream(newValue).mapToInt(Edge::getCost).sum());
-            checkScore(Arrays.stream(newValue).mapToInt(Edge::getCost).sum());
+            updateScore(sumEdgeCost(newValue));
+            checkScore(sumEdgeCost(newValue));
 
-            setValue(model.hasCycle, hasCycle(newValue));
+            syncSet(model.hasCycle, hasCycle(newValue));
 
         });
 
@@ -60,7 +60,7 @@ public class ApplicationController extends ControllerBase<Game> {
             if (oldValue && !newValue && !model.isFinished.getValue()) {
                 increaseCurrentLevel();
                 loadNextLevel();
-                setValue(model.isCountdownFinished, false);
+                syncSet(model.isCountdownFinished, false);
             }
         }));
 
@@ -88,21 +88,27 @@ public class ApplicationController extends ControllerBase<Game> {
         }));
 
         model.activeHints.onChange((oldValue, newValue) -> {
-            log.trace("almost what I need: but length={}", model.activeHints.getValues().length);
             if (!Arrays.stream(model.activeHints.getValues()).toList().isEmpty()) {
-                setValue(model.activeHint,
+                syncSet(model.activeHint,
                     Arrays.stream(model.activeHints.getValues())
                         .min(Comparator.comparingInt(Hint::getPriority))
                         .get());
             } else {
-                log.trace("that's what I need. scheduling empty hint");
-                setValue(model.activeHint, Hint.HINT_EMPTY_HINT);
+                syncSet(model.activeHint, Hint.HINT_EMPTY_HINT);
             }
         });
     }
 
+    public static int sumEdgeCost(Edge[] arr) {
+        return Arrays.stream(arr).mapToInt(Edge::getCost).sum();
+    }
+
+    public static int sumEdgeCost(ObservableArray<Edge> arr) {
+        return sumEdgeCost(get(arr));
+    }
+
     /**
-     * This method checks if the edge array is in a cycle.
+     * This method checks if the edge array has a cycle.
      *
      * @param edgeArray
      * @return boolean
@@ -172,6 +178,48 @@ public class ApplicationController extends ControllerBase<Game> {
         return false;
     }
 
+    public static boolean allTerminalsConnected(Edge[] activatedEdges, Node[] terminals) {
+        Set<Node> visitedNodes = new HashSet<>();
+        List<Edge> edges = Arrays.asList(activatedEdges);
+
+        if (!edges.isEmpty()) {
+            Edge firstEdge = edges.get(0);
+            Node startNode = firstEdge.getFromNode();
+            if (startNode == null) {
+                startNode = firstEdge.getToNode();
+            }
+
+            Stack<Node> stack = new Stack<>();
+            stack.push(startNode);
+
+            while (!stack.isEmpty()) {
+                Node currentNode = stack.pop();
+                visitedNodes.add(currentNode);
+
+                boolean allTerminalsConnected = true;
+                for (Node terminal : terminals) {
+                    if (!visitedNodes.contains(terminal)) {
+                        allTerminalsConnected = false;
+                        break;
+                    }
+                }
+                if (allTerminalsConnected) {
+                    return true;
+                }
+
+                for (Edge edge : edges) {
+                    if (edge.getFromNode() == currentNode && !visitedNodes.contains(edge.getToNode())) {
+                        stack.push(edge.getToNode());
+                    } else if (edge.getToNode() == currentNode && !visitedNodes.contains(edge.getFromNode())) {
+                        stack.push(edge.getFromNode());
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     private void startIgnoringInputs() {
         model.ignoringInputs = true;
     }
@@ -216,7 +264,6 @@ public class ApplicationController extends ControllerBase<Game> {
     private void instanceTerminals() {
         List<Object> level = levels.get(currentLevel);
         List<Integer> terminals = (List<Integer>) level.get(0);
-        int[] terms = terminals.stream().mapToInt(j -> j).toArray();
         var terminalNodes =
             terminals.stream().map(gamePUI::lookUpSegmentIdToSegment).map(seg -> (Node) seg).toArray(Node[]::new);
         setTerminals(terminalNodes);
@@ -226,11 +273,11 @@ public class ApplicationController extends ControllerBase<Game> {
      * This setter method declares the attribute isCountdownFinished to true.
      */
     public void setCountdownFinished() {
-        setValue(model.isCountdownFinished, true);
+        syncSet(model.isCountdownFinished, true);
     }
 
     private void increaseCurrentLevel() {
-        if (currentLevel + 1 > MAX_LEVEL) {
+        if (currentLevel + 1 > model.MAX_LEVEL) {
             currentLevel = 1;
         } else {
             currentLevel++;
@@ -238,30 +285,33 @@ public class ApplicationController extends ControllerBase<Game> {
     }
 
     /**
-     * This method checks if the edge is pressed.
+     * This method is called by {@link GamePUI} every time an edge is pressed.
+     * <p>
+     * It is arguably the most important method because it triggers all logic
+     * calculations.
      *
      * @param edge
      */
     public void edgePressed(Edge edge) {
-        if (!model.gameStarted.getValue()) {
-            if (edge == model.blinkingEdge) {
-                setValue(model.isEdgeBlinking, false);
-                blinkingEdgeScheduler.shutdown();
-                setGameStarted(true);
-                startIgnoringInputs();
+        async(() -> {
+            if (!get(model.gameStarted)) {
+                if (edge == model.blinkingEdge) {
+                    syncSet(model.isEdgeBlinking, false);
+                    blinkingEdgeScheduler.shutdown();
+                    syncSet(model.gameStarted, true);
+                    startIgnoringInputs();
+                }
+                return;
             }
-            return;
-        }
-        if (model.ignoringInputs) {
-            return;
-        }
-        if (edge != null && model.isTippOn.getValue()) {
-            if (edge.equals(model.tippEdge) && !isToBeRemoved) {
+            if (model.ignoringInputs || edge == null) {
+                return;
+            }
+            if (get(model.isTippOn) && edge.equals(model.tippEdge) && !isToBeRemoved) {
                 deactivateEdge(edge);
             }
-        }
-        removeTippEdge();
-        toggleEdge(edge);
+            removeTippEdge();
+            toggleEdge(edge);
+        });
     }
 
     /**
@@ -270,41 +320,35 @@ public class ApplicationController extends ControllerBase<Game> {
      * @param state
      */
     public void setGameStarted(boolean state) {
-        setValue(model.gameStarted, state);
+        syncSet(model.gameStarted, state);
     }
 
     private void toggleEdge(Edge edge) {
         if (edge != null) {
             if (!edge.isOn()) {
                 activateEdge(edge);
-                Sounder.playActivate();
             } else {
                 deactivateEdge(edge);
-                Sounder.playDeactivate();
             }
         }
     }
 
     private void activateEdge(Edge edge) {
-        Edge[] oldValues = model.activatedEdges.getValues();
-        Edge[] newValues = new Edge[oldValues.length + 1];
-        System.arraycopy(oldValues, 0, newValues, 0, oldValues.length);
-        newValues[newValues.length - 1] = edge;
-        setValues(model.activatedEdges, newValues);
+        syncAdd(model.activatedEdges, edge);
+        Sounder.playActivate();
     }
 
     private void deactivateEdge(Edge edge) {
-        Edge[] oldValues = model.activatedEdges.getValues();
-        var newValues = Arrays.stream(oldValues).filter(curr -> curr != edge).toArray(Edge[]::new);
-        setValues(model.activatedEdges, newValues);
+        syncRemove(model.activatedEdges, edge);
+        Sounder.playDeactivate();
     }
 
     private void deactivateAllEdges() {
-        setValues(model.activatedEdges, new Edge[0]);
+        syncSet(model.activatedEdges, new Edge[0]);
     }
 
     private void deactivateAllNodes() {
-        setValues(model.terminals, new Node[0]);
+        syncSet(model.terminals, new Node[0]);
     }
 
     /**
@@ -324,7 +368,7 @@ public class ApplicationController extends ControllerBase<Game> {
      * @param score
      */
     public void updateScore(int score) {
-        setValue(model.currentScore, score);
+        syncSet(model.currentScore, score);
     }
 
     /**
@@ -333,9 +377,9 @@ public class ApplicationController extends ControllerBase<Game> {
      * @param score
      */
     public void checkScore(int score) {
-        int solutionScore = Arrays.stream(model.solution.getValues()).mapToInt(Edge::getCost).sum();
+        int solutionScore = sumEdgeCost(model.solution);
 
-        if (allTerminalsConnected()) {
+        if (allTerminalsConnected(get(model.activatedEdges), get(model.terminals))) {
             if (score <= solutionScore) {
                 finishGame();
             } else {
@@ -346,55 +390,13 @@ public class ApplicationController extends ControllerBase<Game> {
         }
     }
 
-    private boolean allTerminalsConnected() {
-        Set<Node> visitedNodes = new HashSet<>();
-        List<Edge> edges = Arrays.asList(model.activatedEdges.getValues());
-
-        if (!edges.isEmpty()) {
-            Edge firstEdge = edges.get(0);
-            Node startNode = firstEdge.getFromNode();
-            if (startNode == null) {
-                startNode = firstEdge.getToNode();
-            }
-
-            Stack<Node> stack = new Stack<>();
-            stack.push(startNode);
-
-            while (!stack.isEmpty()) {
-                Node currentNode = stack.pop();
-                visitedNodes.add(currentNode);
-
-                boolean allTerminalsConnected = true;
-                for (Node terminal : Arrays.asList(model.terminals.getValues())) {
-                    if (!visitedNodes.contains(terminal)) {
-                        allTerminalsConnected = false;
-                        break;
-                    }
-                }
-                if (allTerminalsConnected) {
-                    return true;
-                }
-
-                for (Edge edge : edges) {
-                    if (edge.getFromNode() == currentNode && !visitedNodes.contains(edge.getToNode())) {
-                        stack.push(edge.getToNode());
-                    } else if (edge.getToNode() == currentNode && !visitedNodes.contains(edge.getFromNode())) {
-                        stack.push(edge.getFromNode());
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
     /**
      * This method sets the attribute terminals.
      *
      * @param terms
      */
     public void setTerminals(Node[] terms) {
-        setValues(model.terminals, terms);
+        syncSet(model.terminals, terms);
     }
 
     /**
@@ -403,7 +405,7 @@ public class ApplicationController extends ControllerBase<Game> {
      * @param edges
      */
     public void setSolution(Edge[] edges) {
-        setValues(model.solution, edges);
+        syncSet(model.solution, edges);
     }
 
     public void handleTipp() {
@@ -441,7 +443,7 @@ public class ApplicationController extends ControllerBase<Game> {
     public void setTippEdge(Edge edge) {
         model.tippEdge = edge;
         model.tippEdge.setColor(isToBeRemoved ? Hint.HINT_REMOVE_EDGE.getColor() : Hint.HINT_PICK_EDGE.getColor());
-        setValue(model.isTippOn, true);
+        syncSet(model.isTippOn, true);
     }
 
     private Edge getRandomEdge(List<Edge> edges) {
@@ -452,45 +454,44 @@ public class ApplicationController extends ControllerBase<Game> {
      * This method remove this tip edge.
      */
     public void removeTippEdge() {
-        setValue(model.isTippOn, false);
+        syncSet(model.isTippOn, false);
         if (model.tippEdge != null) {
             model.tippEdge.setColor(Color.GREEN);
         }
     }
 
     public void finishGame() {
-        setValue(model.isFinished, true);
+        syncSet(model.isFinished, true);
     }
 
     /**
      * This method starts the game again.
      */
     public void playAgain() {
-        setValue(model.isFinished, false);
+        syncSet(model.isFinished, false);
         deactivateAllEdges();
         deactivateAllNodes();
         setGameStarted(false);
     }
 
     public void quitGame() {
-        //setValue(model.isFinished, false);
         deactivateAllEdges();
         deactivateAllNodes();
         setGameStarted(false);
     }
 
     public void setEndTime(String endTime) {
+        log.info("seting endTime={}", model.endTime.get());
         model.endTime.set(endTime);
-        System.out.println(model.endTime.get());
     }
 
     public void addHint(Hint hint) {
-        addUnique(model.activeHints, hint);
-        log.trace("scheduled new Hint add: {}", hint);
+        log.trace("adding hint={}", hint);
+        syncAddUnique(model.activeHints, hint);
     }
 
     public synchronized void removeHint(Hint hint) {
-        remove(model.activeHints, hint);
-        log.trace("remove scheduled: {}", hint);
+        log.trace("removing hint={}", hint);
+        syncRemove(model.activeHints, hint);
     }
 }

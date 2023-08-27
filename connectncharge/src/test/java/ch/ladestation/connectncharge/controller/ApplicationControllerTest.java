@@ -62,18 +62,16 @@ class ApplicationControllerTest {
     public void verifyTogglingOfEdges() {
         var edge = mock(Edge.class);
         when(edge.isOn()).thenReturn(false);
-
         ObservableArray.ValueChangeListener<Edge> mockedListener = mock(ObservableArray.ValueChangeListener.class);
-
         var model = new Game();
         model.activatedEdges.onChange(mockedListener);
-
         var cut = new ApplicationController(model);
         cut.setGameStarted(true);
-        cut.awaitCompletion();
+
+        //when
         cut.edgePressed(edge);
         cut.awaitCompletion();
-
+        //then
         verify(edge, times(1)).on();
         verify(edge, times(0)).setOn(false);
         verify(edge, times(0)).off();
@@ -135,14 +133,13 @@ class ApplicationControllerTest {
         pui = new GamePUI(controller, Pi4JContext.createMockContext(), mockLedStrip);
         controller.setGPUI(pui);
         controller.loadLevels();
-        thoroughlyAwaitCompletion(controller);
         assertArrayEquals(new Edge[0], model.solution.getValues());
 
         controller.loadNextLevel();
         controller.edgePressed(model.blinkingEdge);
+        controller.awaitCompletion();
         controller.setCountdownFinished();
 
-        thoroughlyAwaitCompletion(controller);
         assertTrue(model.gameStarted.getValue());
         assertTrue(model.isCountdownFinished.getValue());
 
@@ -150,16 +147,6 @@ class ApplicationControllerTest {
         assertTrue(sol.length > 0);
         assertFalse(model.ignoringInputs);
         return controller;
-    }
-
-    private void thoroughlyAwaitCompletion(ApplicationController c, int times) {
-        for (var i = 0; i < times; ++i) {
-            c.awaitCompletion();
-        }
-    }
-
-    private void thoroughlyAwaitCompletion(ApplicationController c) {
-        thoroughlyAwaitCompletion(c, 3);
     }
 
     @ParameterizedTest
@@ -174,7 +161,7 @@ class ApplicationControllerTest {
         assertEquals(Hint.HINT_PICK_EDGE.getColor(), sol[omittedIndex].getColor());
         //when
         controller.edgePressed(sol[omittedIndex]);
-        thoroughlyAwaitCompletion(controller);
+        controller.awaitCompletion();
         //then
         assertEquals(Hint.HINT_EMPTY_HINT, model.activeHint.getValue());
         assertArrayEquals(new Hint[0], model.activeHints.getValues());
@@ -193,7 +180,7 @@ class ApplicationControllerTest {
 
         //when
         cut.edgePressed(sol[0]);
-        thoroughlyAwaitCompletion(cut);
+        cut.awaitCompletion();
 
         assertTrue(tooMuch.isOn());
         assertFalse(sol[0].isOn());
@@ -213,7 +200,7 @@ class ApplicationControllerTest {
         pickEdgeTippHandling(cut, sol[0]);
         //when
         cut.edgePressed(sol[2]); //hardcoded edge, not so well designed
-        thoroughlyAwaitCompletion(cut);
+        cut.awaitCompletion();
         //then
         assertEquals(Hint.HINT_EMPTY_HINT, model.activeHint.getValue());
         assertArrayEquals(new Hint[0], model.activeHints.getValues());
@@ -232,10 +219,8 @@ class ApplicationControllerTest {
             }
             controller.edgePressed(sol[i]);
             almost[j++] = sol[i];
-            controller.awaitCompletion();
         }
         controller.awaitCompletion();
-        thoroughlyAwaitCompletion(controller);
         assertArrayEquals(almost, model.activatedEdges.getValues());
         return controller;
     }
@@ -243,7 +228,6 @@ class ApplicationControllerTest {
     private void pickEdgeTippHandling(ApplicationController controller, Edge sol) {
         controller.handleTipp();
 
-        thoroughlyAwaitCompletion(controller);
         assertEquals(sol, model.tippEdge);
         assertTrue(model.isTippOn.getValue());
         assertEquals(Hint.HINT_PICK_EDGE, model.activeHint.getValue());
@@ -251,15 +235,11 @@ class ApplicationControllerTest {
     }
 
     private void removeEdgeTippHandling(ApplicationController ctr, Edge sol, Edge tooMuch) {
-        LOG.trace("test: pressing edge toomuch");
         ctr.edgePressed(tooMuch);
-        thoroughlyAwaitCompletion(ctr);
-        LOG.trace("test: pressing edge sol");
         ctr.edgePressed(sol);
-        thoroughlyAwaitCompletion(ctr);
-        LOG.trace("test: getting tipp");
+        ctr.awaitCompletion();
+
         ctr.handleTipp();
-        thoroughlyAwaitCompletion(ctr, 10);
 
         assertEquals(tooMuch, model.tippEdge);
         assertTrue(model.isTippOn.getValue());
@@ -276,7 +256,6 @@ class ApplicationControllerTest {
         finishLevel(cut);
         //when
         cut.playAgain();
-        thoroughlyAwaitCompletion(cut);
         //then
         assertFalse(model.gameStarted.getValue());
         assertFalse(model.isCountdownFinished.getValue());
@@ -289,9 +268,8 @@ class ApplicationControllerTest {
         assertArrayEquals(new Edge[0], model.activatedEdges.getValues());
         for (var edge : sol) {
             cut.edgePressed(edge);
-            cut.awaitCompletion();
         }
-        thoroughlyAwaitCompletion(cut);
+        cut.awaitCompletion();
         assertTrue(model.isFinished.getValue());
         assertTrue(model.gameStarted.getValue());
         assertTrue(model.ignoringInputs);
@@ -315,14 +293,13 @@ class ApplicationControllerTest {
         var cut = setupGameTrioSkipBlinkingEdgeAndCountDown();
         var sol = model.solution.getValues()[0];
         cut.edgePressed(sol);
-        thoroughlyAwaitCompletion(cut);
+        cut.awaitCompletion();
         assertArrayEquals(new Edge[] {sol}, model.activatedEdges.getValues());
         assertTrue(sol.isOn());
         assertTrue(model.terminals.getValues().length > 0);
 
         //when
         cut.quitGame();
-        thoroughlyAwaitCompletion(cut);
         //then
         assertFalse(model.gameStarted.getValue());
         assertArrayEquals(new Edge[0], model.activatedEdges.getValues());
@@ -341,11 +318,9 @@ class ApplicationControllerTest {
 
         //when
         cut.edgePressed(one);
-        cut.awaitCompletion();
         cut.edgePressed(two);
-        cut.awaitCompletion();
         cut.edgePressed(three);
-        thoroughlyAwaitCompletion(cut);
+        cut.awaitCompletion();
 
         //then
         assertArrayEquals(new Hint[] {Hint.HINT_CYCLE}, model.activeHints.getValues());
@@ -359,16 +334,13 @@ class ApplicationControllerTest {
         var sol1 = model.solution.getValues();
 
         //when
-        for (int i = 0; i < cut.MAX_LEVEL; ++i) {
+        for (int i = 0; i < Game.MAX_LEVEL; ++i) {
             finishLevel(cut);
             cut.playAgain();
-            cut.awaitCompletion();
             cut.edgePressed(model.blinkingEdge);
             cut.awaitCompletion();
             cut.setCountdownFinished();
-            cut.awaitCompletion();
         }
-        thoroughlyAwaitCompletion(cut);
 
         var sol2 = model.solution.getValues();
         //then
@@ -386,7 +358,6 @@ class ApplicationControllerTest {
         }
         //when
         cut.playAgain(); //calling deactivateAllEdges under the hood
-        thoroughlyAwaitCompletion(cut);
         assertArrayEquals(new Edge[0], model.activatedEdges.getValues());
         for (var edge : pui.getAllEdges()) {
             assertFalse(edge.isOn());
