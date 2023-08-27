@@ -28,9 +28,9 @@ import java.util.function.Supplier;
  */
 public abstract class ControllerBase<M> {
 
+    protected final Logger log = LoggerFactory.getLogger(getClass());
     // the model managed by this Controller. Only subclasses have direct access
     protected final M model;
-    protected final Logger log = LoggerFactory.getLogger(getClass().getName());
     private ConcurrentTaskQueue<M> actionQueue;
 
     /**
@@ -44,18 +44,53 @@ public abstract class ControllerBase<M> {
         this.model = model;
     }
 
-    public static <V> V[] arrayRemove(V[] theArray, V toRemove) {
+    protected static <V> V[] arrayRemove(V[] theArray, V toRemove) {
         final var clazz = theArray.getClass().getComponentType();
         IntFunction<V[]> generator = length -> (V[]) Array.newInstance(clazz, length);
         return Arrays.stream(theArray).filter(e -> !e.equals(toRemove)).toArray(generator);
     }
 
-    public static <V> V[] arrayAdd(V[] theArray, V toAdd) {
+    protected static <V> V[] arrayAdd(V[] theArray, V toAdd) {
         var length = theArray.length;
         V[] newArr = (V[]) Array.newInstance(theArray.getClass().getComponentType(), length + 1);
         System.arraycopy(theArray, 0, newArr, 0, length);
         newArr[length] = toAdd;
         return newArr;
+    }
+
+    protected static <V> V get(ObservableValue<V> observableValue) {
+        return observableValue.getValue();
+    }
+
+    protected static <V> V[] get(ObservableArray<V> observableArray) {
+        return observableArray.getValues();
+    }
+
+    protected static <V> V get(ObservableArray<V> observableArray, int position) {
+        return observableArray.getValue(position);
+    }
+
+    protected static <V> void syncSet(ObservableValue<V> val, V newVal) {
+        val.setValue(newVal);
+    }
+
+    protected static <V> void syncSet(ObservableArray<V> arr, V[] newVal) {
+        arr.setValues(newVal);
+    }
+
+    protected static <V> void syncRemove(ObservableArray<V> arr, V elem) {
+        arr.setValues(arrayRemove(get(arr), elem));
+    }
+
+    protected static <V> void syncAdd(ObservableArray<V> arr, V elem) {
+        arr.setValues(arrayAdd(get(arr), elem));
+    }
+
+    protected static <V> void syncAddUnique(ObservableArray<V> arr, V elem) {
+        V[] vals = get(arr);
+        if (!Arrays.asList(vals).contains(elem)) {
+            arr.setValues(arrayAdd(vals, elem));
+        }
     }
 
     public void shutdown() {
@@ -119,15 +154,15 @@ public abstract class ControllerBase<M> {
         }
 
         CountDownLatch latch = new CountDownLatch(1);
-        log.trace("starting await completion {}", this.hashCode());
+        log.trace("starting awaitCompletion()");
         runLater(m -> latch.countDown());
         try {
             //noinspection ResultOfMethodCallIgnored
             latch.await(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            throw new IllegalStateException("CountDownLatch was interrupted");
+            throw new IllegalStateException("CountDownLatch in awaitCompletion() was interrupted");
         }
-        log.trace("finished await completion {}", this.hashCode());
+        log.trace("finished awaitCompletion()");
     }
 
     /**
@@ -149,7 +184,7 @@ public abstract class ControllerBase<M> {
      */
     protected <V> void setValue(ObservableValue<V> observableValue, V newValue) {
         log.trace("scheduling setValue({}, {})", observableValue.toString(), newValue);
-        async(() -> observableValue.setValue(newValue));
+        async(() -> syncSet(observableValue, newValue));
     }
 
     /**
@@ -160,7 +195,7 @@ public abstract class ControllerBase<M> {
      * Values are set asynchronously.
      */
     protected <V> void setValues(ObservableArray<V> observableArray, V[] newValues) {
-        async(() -> observableArray.setValues(newValues));
+        async(() -> syncSet(observableArray, newValues));
     }
 
     /**
@@ -172,18 +207,6 @@ public abstract class ControllerBase<M> {
      */
     protected <V> void setValue(ObservableArray<V> observableArray, int position, V newValue) {
         async(() -> observableArray.setValue(position, newValue));
-    }
-
-    protected <V> V get(ObservableValue<V> observableValue) {
-        return observableValue.getValue();
-    }
-
-    protected <V> V[] get(ObservableArray<V> observableArray) {
-        return observableArray.getValues();
-    }
-
-    protected <V> V get(ObservableArray<V> observableArray, int position) {
-        return observableArray.getValue(position);
     }
 
     /**
@@ -236,35 +259,31 @@ public abstract class ControllerBase<M> {
      * @param <V>             the type of the array and element
      */
     protected <V> void remove(ObservableArray<V> observableArray, V elementToRemove) {
-        async(() -> observableArray.setValues(arrayRemove(get(observableArray), elementToRemove)));
+        async(() -> syncRemove(observableArray, elementToRemove));
     }
 
     /**
      * Convenience method to add an element to an {@code ObservableArray<V>}
+     * asynchronously.
      *
      * @param observableArray the array that will be affected
      * @param elementToAdd    the element to add
      * @param <V>             the type of the array and element
      */
     protected <V> void add(ObservableArray<V> observableArray, V elementToAdd) {
-        async(() -> observableArray.setValues(arrayAdd(observableArray.getValues(), elementToAdd)));
+        async(() -> syncAdd(observableArray, elementToAdd));
     }
 
     /**
-     * Convenience method to add an element to an {@code ObservableArray<V>} but
-     * only if the array doesn't already contain that element
+     * Convenience method to add an element to an {@code ObservableArray<V>}
+     * asynchronously but only if the array doesn't already contain that element.
      *
      * @param observableArray the array that will be affected
      * @param elementToAdd    the element to add
      * @param <V>             the type of the array and element
      */
     protected <V> void addUnique(ObservableArray<V> observableArray, V elementToAdd) {
-        async(() -> {
-            V[] vals = observableArray.getValues();
-            if (!Arrays.asList(vals).contains(elementToAdd)) {
-                observableArray.setValues(arrayAdd(vals, elementToAdd));
-            }
-        });
+        async(() -> syncAddUnique(observableArray, elementToAdd));
     }
 
     /**
@@ -289,9 +308,9 @@ public abstract class ControllerBase<M> {
      * <p>
      * Use 'set', 'increase', 'decrease' or 'toggle' to get an appropriate Setter
      */
-    protected void updateModel(Setter<?>... setters) {
+    protected void updateModel(SetterInterface... setters) {
         async(() -> {
-            for (Setter<?> setter : setters) {
+            for (var setter : setters) {
                 setter.setValue();
             }
         });
@@ -317,7 +336,11 @@ public abstract class ControllerBase<M> {
         return new ArraySetter<>(observableArray, () -> values);
     }
 
-    protected static final class Setter<V> {
+    protected interface SetterInterface {
+        void setValue();
+    }
+
+    protected static final class Setter<V> implements SetterInterface {
         private final ObservableValue<V> observableValue;
 
         // supplier is used here to get the value at execution time and not at registration time
@@ -328,12 +351,13 @@ public abstract class ControllerBase<M> {
             this.valueSupplier = valueSupplier;
         }
 
-        void setValue() {
+        @Override
+        public void setValue() {
             observableValue.setValue(valueSupplier.get());
         }
     }
 
-    protected static final class ArraySetter<V> {
+    protected static final class ArraySetter<V> implements SetterInterface {
         private final ObservableArray<V> observableArray;
         private final Supplier<V[]> valuesSupplier;
 
@@ -342,7 +366,8 @@ public abstract class ControllerBase<M> {
             this.valuesSupplier = valuesSupplier;
         }
 
-        void setValue() {
+        @Override
+        public void setValue() {
             observableArray.setValues(valuesSupplier.get());
         }
     }
