@@ -32,7 +32,7 @@ public final class CSVReader {
     public static List<List<String>> readCSV() {
         List<List<String>> records = new ArrayList<>();
         InputStream csv = CSVReader.class.getResourceAsStream(LEDSEGMENTS_CSV);
-        Objects.requireNonNull(csv, "error, " + LEDSEGMENTS_CSV + " fiel was null");
+        Objects.requireNonNull(csv, "error, " + LEDSEGMENTS_CSV + " file was null");
         try (BufferedReader br = new BufferedReader(new InputStreamReader(csv, StandardCharsets.UTF_8))) {
             String line;
             while ((line = br.readLine()) != null) {

@@ -1,7 +1,26 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run on Pi (X11)" type="MavenRunConfiguration" factoryName="Maven">
     <MavenSettings>
-      <option name="myGeneralSettings" />
+      <option name="myGeneralSettings">
+        <MavenGeneralSettings>
+          <option name="alwaysUpdateSnapshots" value="false" />
+          <option name="checksumPolicy" value="NOT_SET" />
+          <option name="emulateTerminal" value="false" />
+          <option name="failureBehavior" value="NOT_SET" />
+          <option name="localRepository" value="" />
+          <option name="mavenHome" value="Bundled (Maven 3)" />
+          <option name="nonRecursive" value="false" />
+          <option name="outputLevel" value="INFO" />
+          <option name="pluginUpdatePolicy" value="DEFAULT" />
+          <option name="printErrorStackTraces" value="false" />
+          <option name="showDialogWithAdvancedSettings" value="false" />
+          <option name="threads" />
+          <option name="useMavenConfig" value="true" />
+          <option name="usePluginRegistry" value="false" />
+          <option name="userSettingsFile" value="" />
+          <option name="workOffline" value="false" />
+        </MavenGeneralSettings>
+      </option>
       <option name="myRunnerSettings">
         <MavenRunnerSettings>
           <option name="delegateBuildToMaven" value="false" />
@@ -10,11 +29,7 @@
           </option>
           <option name="jreName" value="17" />
           <option name="mavenProperties">
-            <map>
-              <entry key="pi.ipnumber" value="10.175.12.184" />
-              <entry key="pi.password" value="Ladestation" />
-              <entry key="pi.username" value="pi" />
-            </map>
+            <map />
           </option>
           <option name="passParentEnv" value="true" />
           <option name="runMavenInBackground" value="true" />
@@ -32,7 +47,7 @@
               <option value="install" />
             </list>
           </option>
-          <option name="pomFileName" value="pom.xml" />
+          <option name="pomFileName" value=".\connectncharge\pom.xml" />
           <option name="profilesMap">
             <map>
               <entry key="jfx-remote-run-X11" value="true" />

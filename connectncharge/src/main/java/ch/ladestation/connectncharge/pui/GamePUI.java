@@ -18,6 +18,7 @@ import com.pi4j.io.spi.Spi;
 import com.pi4j.io.spi.SpiBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.MessageFormatter;
 
 import java.io.IOException;
 import java.util.*;
@@ -186,8 +187,18 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
     private void addEdgePressListenerToPinView(int indexOfIC, MCP23S17.PinView pinView,
                                                ApplicationController controller) {
         pinView.addListener((state, pin) -> {
+            LOG.debug("Interrupt triggered for Chip={}, Pin={}. state={}", indexOfIC, pin.getPinNumber(), state);
+            var edge = lookUpChipAndPinNumberToEdge(indexOfIC, pin.getPinNumber());
+            if (edge == null) {
+                var msg = MessageFormatter.arrayFormat("No Edge registered for Chip {}, Pin {}. "
+                            + "Please revise src/main/resources{} and/or the elctrical connections.",
+                        new Object[] {indexOfIC, pin.getPinNumber(), CSVReader.LEDSEGMENTS_CSV})
+                    .getMessage();
+                LOG.error(msg);
+                throw new NoSuchElementException(msg);
+            }
             if (state) {
-                handleEdgePressed(lookUpChipAndPinNumberToEdge(indexOfIC, pin.getPinNumber()), controller);
+                handleEdgePressed(edge, controller);
             }
         });
     }
