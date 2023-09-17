@@ -7,7 +7,6 @@ import ch.ladestation.connectncharge.model.game.gamelogic.Node;
 import ch.ladestation.connectncharge.model.game.gamelogic.Segment;
 import ch.ladestation.connectncharge.services.file.CSVReader;
 import ch.ladestation.connectncharge.util.mvcbase.PuiBase;
-import com.github.mbelling.ws281x.Color;
 import com.github.mbelling.ws281x.LedStrip;
 import com.github.mbelling.ws281x.LedStripType;
 import com.github.mbelling.ws281x.Ws281xLedStrip;
@@ -34,9 +33,8 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
      */
     private static final Logger LOG = LoggerFactory.getLogger(GamePUI.class);
     private final String hOUSEFLAG = "H";
+    private LEDAnimator ledAnimator;
     private List<MCP23S17> chips;
-    private LedStrip ledStrip;
-
     private List<Edge> edges;
     private List<Node> nodes;
     private Map<Integer, Map<Integer, Edge>> pinToEdgeLUT;
@@ -44,18 +42,9 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
     private DigitalInput[] interruptPins;
     private Spi spiInterface;
     private Game modelInstance;
-
-    public GamePUI(ApplicationController controller, Context pi4J) {
-        this(controller, pi4J, null);
-    }
-
-    public GamePUI(ApplicationController controller, Context pi4J, Ws281xLedStrip ledStrip) {
+    public GamePUI(ApplicationController controller, Context pi4J, LEDAnimator animator) {
         super(controller, pi4J);
-        if (ledStrip != null) {
-            this.ledStrip = ledStrip;
-        } else {
-            this.ledStrip = setupLEDStrip();
-        }
+        this.ledAnimator = animator;
         setupOwnModelToUiBindings(this.modelInstance);
     }
 
@@ -64,7 +53,7 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
      *
      * @return the {@link LedStrip} object
      */
-    private static LedStrip setupLEDStrip() {
+    public static LedStrip setupLEDStrip() {
         LedStrip ledStrip = new Ws281xLedStrip(845, 10, 800000, 10, false, LedStripType.WS2811_STRIP_GRB, true);
         return ledStrip;
     }
@@ -107,55 +96,25 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
      */
     public void setupOwnModelToUiBindings(Game model) {
         onChangeOf(model.activatedEdges).execute(((oldValue, newValue) -> {
-            synchronized (ledStrip) {
-                LOG.debug(DEBUG_MSG_REACT_TO_ARR_CHANGE, "Game.activatedEdges", oldValue.length, newValue.length);
-                changeMultipleLEDSegmentState(oldValue, false);
-                changeMultipleLEDSegmentState(newValue, true);
-                ledStrip.render();
-            }
+            LOG.debug(DEBUG_MSG_REACT_TO_ARR_CHANGE, "Game.activatedEdges", oldValue.length, newValue.length);
+            ledAnimator.scheduleEdgesToBeAnimated(oldValue, newValue);
         }));
 
         onChangeOf(model.terminals).execute(((oldValue, newValue) -> {
-            synchronized (ledStrip) {
-                LOG.debug(DEBUG_MSG_REACT_TO_ARR_CHANGE, "Game.terminals", oldValue.length, newValue.length);
-                changeMultipleLEDSegmentState(oldValue, false);
-                changeMultipleLEDSegmentState(newValue, true);
-                ledStrip.render();
-            }
+            LOG.debug(DEBUG_MSG_REACT_TO_ARR_CHANGE, "Game.terminals", oldValue.length, newValue.length);
+            ledAnimator.simplyToggleMultipleSegments(oldValue, false);
+            ledAnimator.simplyToggleMultipleSegments(newValue, true);
         }));
 
         onChangeOf(model.isEdgeBlinking).execute((oldValue, newValue) -> {
-            synchronized (ledStrip) {
-                LOG.debug(DEBUG_MSG_REACT_TO_CHANGE, "Game.isEdgeBlinking", oldValue, newValue);
-                changeLEDSegmentState(model.blinkingEdge, newValue);
-                ledStrip.render();
-            }
+            LOG.debug(DEBUG_MSG_REACT_TO_CHANGE, "Game.isEdgeBlinking", oldValue, newValue);
+            ledAnimator.simplyToggleSegment(model.blinkingEdge, newValue);
         });
 
         onChangeOf(model.isTippOn).execute((oldValue, newValue) -> {
-            synchronized (ledStrip) {
-                LOG.debug(DEBUG_MSG_REACT_TO_CHANGE, "Game.isTippOn", oldValue, newValue);
-                changeLEDSegmentState(model.tippEdge, newValue);
-                ledStrip.render();
-            }
+            LOG.debug(DEBUG_MSG_REACT_TO_CHANGE, "Game.isTippOn", oldValue, newValue);
+            ledAnimator.simplyToggleSegment(model.tippEdge, newValue);
         });
-    }
-
-    private void changeMultipleLEDSegmentState(Segment[] newValue, boolean state) {
-        for (var seg : newValue) {
-            changeLEDSegmentState(seg, state);
-        }
-    }
-
-    private void changeLEDSegmentState(Segment seg, boolean state) {
-        if (seg == null) {
-            return;
-        }
-        int from = seg.getStartIndex();
-        int to = seg.getEndIndex();
-        for (var i = from; i <= to; ++i) {
-            ledStrip.setPixel(i, state ? seg.getColor() : Color.BLACK);
-        }
     }
 
     /**

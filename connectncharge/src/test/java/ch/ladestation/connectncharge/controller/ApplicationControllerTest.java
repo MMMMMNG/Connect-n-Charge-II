@@ -5,9 +5,9 @@ import ch.ladestation.connectncharge.model.game.gamelogic.Game;
 import ch.ladestation.connectncharge.model.game.gamelogic.Hint;
 import ch.ladestation.connectncharge.model.game.gamelogic.Node;
 import ch.ladestation.connectncharge.pui.GamePUI;
+import ch.ladestation.connectncharge.pui.LEDAnimator;
 import ch.ladestation.connectncharge.util.Pi4JContext;
 import ch.ladestation.connectncharge.util.mvcbase.ObservableArray;
-import com.github.mbelling.ws281x.Ws281xLedStrip;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,6 +55,10 @@ class ApplicationControllerTest {
             Arguments.of(graph4treeAndDisconnectedCycle, true),
             Arguments.of(graph5bigCycle, true)
         );
+    }
+
+    private LEDAnimator mockAnimator() {
+        return mock(LEDAnimator.class);
     }
 
     @Test
@@ -129,8 +133,7 @@ class ApplicationControllerTest {
         model = new Game();
         controller = new ApplicationController(model);
 
-        var mockLedStrip = mock(Ws281xLedStrip.class);
-        pui = new GamePUI(controller, Pi4JContext.createMockContext(), mockLedStrip);
+        pui = new GamePUI(controller, Pi4JContext.createMockContext(), mockAnimator());
         controller.setGPUI(pui);
         controller.loadLevels();
         assertArrayEquals(new Edge[0], model.solution.getValues());
