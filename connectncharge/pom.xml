@@ -90,7 +90,8 @@
 
         <pi.username>pi</pi.username>
         <pi.password>Ladestation</pi.password>
-        <pi.ipnumber>10.175.31.132</pi.ipnumber>
+        <!--<pi.ipnumber>10.175.6.184</pi.ipnumber>-->
+        <pi.ipnumber>piladestation</pi.ipnumber>
         <pi.port>22</pi.port>
         <pi.deploydirectory>/home/pi/deploy</pi.deploydirectory>
 
@@ -104,7 +105,7 @@
         <!-- Project Dependency Versions-->
         <javafx.version>17.0.2</javafx.version>
         <pi4j.version>2.3.0</pi4j.version>
-        <slf4j.version>2.0.7</slf4j.version>
+        <slf4j.version>1.7.32</slf4j.version>
         <junit.version>5.9.0</junit.version>
         <rpi-ws281x-java.version>2.0.0-SNAPSHOT</rpi-ws281x-java.version>
 
@@ -238,7 +239,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.version}</version>
-            <scope>test</scope>
         </dependency>
 
 
@@ -564,6 +564,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
+                        <version>${maven-antrun-plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>transfer</id>
@@ -622,6 +623,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
+                        <version>${maven-antrun-plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>transfer</id>
