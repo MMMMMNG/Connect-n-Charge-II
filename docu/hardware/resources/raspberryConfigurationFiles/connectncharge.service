@@ -1,0 +1,12 @@
+[Unit]
+Description=Connect 'n Charge App
+
+[Service]
+ExecStart=/home/pi/startScript.sh
+Restart=on-failure
+RestartSec=5s
+StartLimitInterval=1min
+StartLimitBurst=3
+
+[Install]
+WantedBy=default.target
