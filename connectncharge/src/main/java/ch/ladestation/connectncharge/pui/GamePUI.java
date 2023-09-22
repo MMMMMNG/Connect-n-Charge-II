@@ -1,10 +1,7 @@
 package ch.ladestation.connectncharge.pui;
 
 import ch.ladestation.connectncharge.controller.ApplicationController;
-import ch.ladestation.connectncharge.model.game.gamelogic.Edge;
-import ch.ladestation.connectncharge.model.game.gamelogic.Game;
-import ch.ladestation.connectncharge.model.game.gamelogic.Node;
-import ch.ladestation.connectncharge.model.game.gamelogic.Segment;
+import ch.ladestation.connectncharge.model.game.gamelogic.*;
 import ch.ladestation.connectncharge.services.file.CSVReader;
 import ch.ladestation.connectncharge.util.mvcbase.PuiBase;
 import com.github.mbelling.ws281x.LedStrip;
@@ -42,6 +39,7 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
     private DigitalInput[] interruptPins;
     private Spi spiInterface;
     private Game modelInstance;
+
     public GamePUI(ApplicationController controller, Context pi4J, LEDAnimator animator) {
         super(controller, pi4J);
         this.ledAnimator = animator;
@@ -97,6 +95,11 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
     public void setupOwnModelToUiBindings(Game model) {
         onChangeOf(model.activatedEdges).execute(((oldValue, newValue) -> {
             LOG.debug(DEBUG_MSG_REACT_TO_ARR_CHANGE, "Game.activatedEdges", oldValue.length, newValue.length);
+            if (oldValue.length < newValue.length) {
+                Sounder.playActivate();
+            } else if (oldValue.length > newValue.length) {
+                Sounder.playDeactivate();
+            }
             ledAnimator.scheduleEdgesToBeAnimated(oldValue, newValue);
         }));
 
@@ -115,6 +118,18 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
             LOG.debug(DEBUG_MSG_REACT_TO_CHANGE, "Game.isTippOn", oldValue, newValue);
             ledAnimator.simplyToggleSegment(model.tippEdge, newValue);
         });
+
+        onChangeOf(model.activeHint).execute((oldValue, newValue) -> {
+            if (newValue != Hint.HINT_EMPTY_HINT) {
+                Sounder.playNotification();
+            }
+        });
+
+        onChangeOf(model.isFinished).execute(((oldValue, newValue) -> {
+            if (Boolean.TRUE.equals(newValue)) {
+                Sounder.playWin();
+            }
+        }));
     }
 
     /**

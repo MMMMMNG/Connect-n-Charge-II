@@ -40,6 +40,7 @@ public class AppStarter extends Application {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             controller.shutdown();
             pi4J.shutdown();
+            Sounder.shutdown();
             LOGGER.logInfo("App stopped");
         }));
         launch();

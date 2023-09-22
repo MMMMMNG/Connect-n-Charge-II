@@ -5,7 +5,6 @@ import ch.ladestation.connectncharge.model.game.gamelogic.Game;
 import ch.ladestation.connectncharge.model.game.gamelogic.Hint;
 import ch.ladestation.connectncharge.model.game.gamelogic.Node;
 import ch.ladestation.connectncharge.pui.GamePUI;
-import ch.ladestation.connectncharge.pui.Sounder;
 import ch.ladestation.connectncharge.services.file.TextFileEditor;
 import ch.ladestation.connectncharge.util.mvcbase.ControllerBase;
 import ch.ladestation.connectncharge.util.mvcbase.ObservableArray;
@@ -335,12 +334,10 @@ public class ApplicationController extends ControllerBase<Game> {
 
     private void activateEdge(Edge edge) {
         syncAdd(model.activatedEdges, edge);
-        Sounder.playActivate();
     }
 
     private void deactivateEdge(Edge edge) {
         syncRemove(model.activatedEdges, edge);
-        Sounder.playDeactivate();
     }
 
     private void deactivateAllEdges() {
