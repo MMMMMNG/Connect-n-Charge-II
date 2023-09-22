@@ -35,9 +35,16 @@ public class LEDAnimator {
 
     public void frameTick() {
         synchronized (ledStates) {
-            for (var anim : activeAnims) {
-                if (!anim.tick(ledStates)) {
-                    activeAnims.remove(anim);
+            var iter = activeAnims.iterator();
+            while (iter.hasNext()) {
+                var current = iter.next();
+                try {
+                    if (!current.tick(ledStates)) {
+                        iter.remove();
+                    }
+                } catch (Exception e) {
+                    LOGGER.warn("faulty animation code, removing offender", e);
+                    iter.remove();
                 }
             }
             render(ledStates, stripRef);
