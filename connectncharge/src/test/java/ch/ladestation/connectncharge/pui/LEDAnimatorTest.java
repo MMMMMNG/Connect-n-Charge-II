@@ -18,10 +18,12 @@ public class LEDAnimatorTest {
         return mock;
     }
 
+    //this test sucks massively. Needs to be decoupled from the actual animation used.
     @Test
     @DisplayName("Test that one single animation triggers the wanted amount of renders")
     public void testAddAnimation() {
-        final int lEDAMOUNTINTEST = 5;
+        final int lEDAMOUNTINTEST = 4; //has to be even
+        final int aNIMATIONCALLS = 3;
         //given
         var mockStrip = mockLedStrip();
         var mockEdge = mock(Edge.class);
@@ -40,8 +42,8 @@ public class LEDAnimatorTest {
             throw new RuntimeException(e);
         }
         //then
-        verify(mockStrip, times(lEDAMOUNTINTEST)).render();
-        verify(mockStrip, times(AMOUNT_LEDS * lEDAMOUNTINTEST)).setPixel(anyInt(), any(Color.class));
+        verify(mockStrip, times(aNIMATIONCALLS)).render();
+        verify(mockStrip, times(AMOUNT_LEDS * aNIMATIONCALLS)).setPixel(anyInt(), any(Color.class));
 
     }
 }

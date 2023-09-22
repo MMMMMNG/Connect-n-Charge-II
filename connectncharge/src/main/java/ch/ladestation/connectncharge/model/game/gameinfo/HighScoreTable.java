@@ -21,7 +21,7 @@ public final class HighScoreTable {
     private HighScoreTable() {
         throw new AssertionError();
     }
-    
+
     public static void initRowHeight(TableView<HighScorePlayer> tableView) {
         tableView.setRowFactory(param -> new TableRow<HighScorePlayer>() {
             @Override
@@ -74,8 +74,8 @@ public final class HighScoreTable {
 
     public static void editTableViews(List<Player> playerList, String filePath) {
         TextFileEditor.writeTextFile(filePath,
-            playerList.stream().map(val -> val.getPlayerName() + "," + val.getEndTime()).peek(p -> {
-                System.out.println(p);
-            }).collect(Collectors.toList()));
+            playerList.stream()
+                .map(val -> val.getPlayerName() + "," + val.getEndTime())
+                .collect(Collectors.toList()));
     }
 }

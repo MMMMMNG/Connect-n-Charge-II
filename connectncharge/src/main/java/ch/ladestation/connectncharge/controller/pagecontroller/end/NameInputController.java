@@ -100,11 +100,6 @@ public class NameInputController implements Initializable, ViewMixin<Game, Contr
     private boolean capsLockOn = false;
     private static String currentName;
 
-    @FXML
-    public void showNamePage(ActionEvent event) throws IOException {
-        StageHandler.openStage(FilePath.NAMEINPUT.getFilePath());
-    }
-
     public void goBackToEndScreen(MouseEvent mouseEvent) throws IOException {
         StageHandler.openStage(FilePath.ENDSCREEN.getFilePath());
     }
@@ -293,10 +288,6 @@ public class NameInputController implements Initializable, ViewMixin<Game, Contr
     @Override
     public List<String> getStylesheets() {
         return null;
-    }
-
-    public void handleInputName(ActionEvent actionEvent) {
-        currentName = txtNameInput.getText();
     }
 
     public static String getCurrentName() {

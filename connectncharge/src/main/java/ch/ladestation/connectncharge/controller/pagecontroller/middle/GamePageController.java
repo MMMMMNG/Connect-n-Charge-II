@@ -23,6 +23,7 @@ import java.util.ResourceBundle;
 
 public class GamePageController implements ViewMixin<Game, ControllerBase<Game>>, Initializable, PageController {
 
+    private static String publicEndTime;
     @FXML
     private AnchorPane endGampePopupPane;
     @FXML
@@ -41,11 +42,22 @@ public class GamePageController implements ViewMixin<Game, ControllerBase<Game>>
     private Label timerLabel;
     @FXML
     private Label tippLabel;
-
-    private static String publicEndTime;
     private String leaveGamePath;
 
     private ApplicationController controller;
+
+    /**
+     * This method is getter for publicEndTime.
+     *
+     * @return publicEndTime
+     */
+    public static String getPublicEndTime() {
+        return publicEndTime;
+    }
+
+    public static void setPublicEndTime(String publicEndTimeParam) {
+        publicEndTime = publicEndTimeParam;
+    }
 
     /**
      * initialize
@@ -68,19 +80,6 @@ public class GamePageController implements ViewMixin<Game, ControllerBase<Game>>
         init(controller);
         this.controller = controller;
         MyTimer.setController(controller);
-    }
-
-    /**
-     * This method is getter for publicEndTime.
-     *
-     * @return publicEndTime
-     */
-    public static String getPublicEndTime() {
-        return publicEndTime;
-    }
-
-    public static void setPublicEndTime(String publicEndTimeParam) {
-        publicEndTime = publicEndTimeParam;
     }
 
     private void startTimer() {
@@ -195,13 +194,8 @@ public class GamePageController implements ViewMixin<Game, ControllerBase<Game>>
         }));
         onChangeOf(model.isFinished).execute((oldValue, newValue) -> {
             if (!oldValue && newValue) {
-                try {
-                    endGame();
-                    StageHandler.openStage(FilePath.ENDSCREEN.getFilePath());
-                    //controller.finishGame();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                endGame();
+                StageHandler.openStage(FilePath.ENDSCREEN.getFilePath());
             }
         });
         onChangeOf(model.activeHint).execute(((oldValue, newValue) -> {

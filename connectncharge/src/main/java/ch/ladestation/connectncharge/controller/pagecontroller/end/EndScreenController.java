@@ -99,7 +99,6 @@ public class EndScreenController implements Initializable, ViewMixin<Game, Contr
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        lblTime.setText(GamePageController.getPublicEndTime());
     }
 
     @Override
@@ -126,6 +125,6 @@ public class EndScreenController implements Initializable, ViewMixin<Game, Contr
     @Override
     public void setupModelToUiBindings(Game model) {
         lblTime.textProperty().bind(model.endTime);
-        System.out.println("lblTime.textProperty(): " + lblTime.textProperty());
+        GamePageController.setPublicEndTime(model.endTime.get());
     }
 }
