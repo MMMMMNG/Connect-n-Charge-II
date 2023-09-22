@@ -1,0 +1,4 @@
+#file: /etc/xdg/lxsession/LXDE-pi/autostart
+#@lxpanel --profile LXDE-pi #hide the taskbar
+@pcmanfm --desktop --profile LXDE-pi
+@xscreensaver -no-splash
