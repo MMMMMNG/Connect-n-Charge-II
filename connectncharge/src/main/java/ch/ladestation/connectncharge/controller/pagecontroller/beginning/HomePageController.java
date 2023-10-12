@@ -9,6 +9,7 @@ import ch.ladestation.connectncharge.util.mvcbase.ControllerBase;
 import ch.ladestation.connectncharge.util.mvcbase.ViewMixin;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
@@ -19,11 +20,8 @@ public class HomePageController implements ViewMixin<Game, ControllerBase<Game>>
     private AnchorPane menuPane;
     @FXML
     private AnchorPane shadowPane;
-
     @FXML
-    public void handleShowEdgePresser(ActionEvent event) throws IOException {
-        StageHandler.openStage(FilePath.EDGECLICKSCREEN.getFilePath());
-    }
+    private Button startButton;
 
     @FXML
     private void handleStackMenuClick(ActionEvent event) {
@@ -69,7 +67,15 @@ public class HomePageController implements ViewMixin<Game, ControllerBase<Game>>
     @Override
     public void setController(ApplicationController controller) {
         init(controller);
-        controller.loadLevels();
+    }
+
+    @Override
+    public void setupUiToActionBindings(ControllerBase<Game> controller) {
+        var ctrl = (ApplicationController) controller;
+        startButton.setOnMouseClicked(m -> {
+            StageHandler.openStage(FilePath.EDGECLICKSCREEN.getFilePath());
+            ctrl.startRound();
+        });
     }
 
     @Override

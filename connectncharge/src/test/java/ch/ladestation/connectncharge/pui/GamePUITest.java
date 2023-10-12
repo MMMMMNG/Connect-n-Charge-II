@@ -4,7 +4,6 @@ import ch.ladestation.connectncharge.controller.ApplicationController;
 import ch.ladestation.connectncharge.model.game.gamelogic.Edge;
 import ch.ladestation.connectncharge.model.game.gamelogic.Game;
 import com.github.mbelling.ws281x.Color;
-import com.github.mbelling.ws281x.Ws281xLedStrip;
 import com.pi4j.io.gpio.digital.DigitalState;
 import com.pi4j.plugin.mock.provider.spi.MockSpi;
 import org.junit.jupiter.api.DisplayName;
@@ -13,13 +12,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
-import java.util.concurrent.Semaphore;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class GamePUITest extends ComponentTest {
+
+    private LEDAnimator mockAnimator() {
+        return mock(LEDAnimator.class);
+    }
 
     @Test
     @DisplayName("Tests that the ICs are initialized correctly via SPI")
@@ -29,9 +31,7 @@ public class GamePUITest extends ComponentTest {
         var mockController = mock(ApplicationController.class);
         when(mockController.getModel()).thenReturn(model);
 
-        var mockLedStrip = mock(Ws281xLedStrip.class);
-
-        GamePUI pui = new GamePUI(mockController, this.pi4j, mockLedStrip);
+        GamePUI pui = new GamePUI(mockController, this.pi4j, mockAnimator());
 
         var mockedPins = Arrays.stream(pui.getInterruptPins()).map(this::toMock).toList();
         var mockedSpi = toMock(pui.getSpiInterface());
@@ -98,9 +98,9 @@ public class GamePUITest extends ComponentTest {
         var mockController = mock(ApplicationController.class);
         when(mockController.getModel()).thenReturn(model);
 
-        var mockLedStrip = mock(Ws281xLedStrip.class);
+        var mockAnimator = mockAnimator();
 
-        GamePUI pui = new GamePUI(mockController, this.pi4j, mockLedStrip);
+        GamePUI pui = new GamePUI(mockController, this.pi4j, mockAnimator);
 
         var mockedPins = Arrays.stream(pui.getInterruptPins()).map(this::toMock).toList();
         var mockedSpi = toMock(pui.getSpiInterface());
@@ -138,33 +138,17 @@ public class GamePUITest extends ComponentTest {
         var controller = new ApplicationController(model);
         controller.setGameStarted(true);
         controller.awaitCompletion(); //what the heck? why is this so flipping inconsistent?
-        var mockLedStrip = mock(Ws281xLedStrip.class);
-        GamePUI pui = new GamePUI(controller, this.pi4j, mockLedStrip);
-        var inOrder = inOrder(mockLedStrip);
+        var mockAnimator = mockAnimator();
+        GamePUI pui = new GamePUI(controller, this.pi4j, mockAnimator);
 
         var theEdge = (Edge) pui.lookUpSegmentIdToSegment(segmentIndex);
-        var numPixels = theEdge.getEndIndex() - theEdge.getStartIndex() + 1;
-        log.debug("when controller.edgePressed(theEdge={});", segmentIndex);
+        //when
         controller.edgePressed(theEdge);
-        log.debug("controller.awaitCompletion()");
+        log.debug("when controller.edgePressed(theEdge={});", segmentIndex);
         controller.awaitCompletion();
-        var mutex = new Semaphore(1);
-        try {
-            mutex.acquire();
-            controller.runLater(v -> mutex.release());
-            mutex.acquire();
-            pui.runLater(v -> mutex.release());
-            log.debug("final acquire() in testModelToLEDStripBinding(segmentIndex={})", segmentIndex);
-            mutex.acquire();
-            log.debug("try and verify in testModelToLEDStripBinding(segmentIndex={})", segmentIndex);
-
-            inOrder.verify(mockLedStrip, times(numPixels)).setPixel(anyInt(), eq(theEdge.getColor()));
-            inOrder.verify(mockLedStrip).render();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } finally {
-            mutex.release();
-        }
+        pui.awaitCompletion();
+        //then
+        verify(mockAnimator, times(1)).scheduleEdgesToBeAnimated(new Edge[0], new Edge[] {theEdge});
     }
 
     @ParameterizedTest
@@ -176,20 +160,17 @@ public class GamePUITest extends ComponentTest {
         var model = new Game();
         var controller = new ApplicationController(model);
         controller.setGameStarted(true);
-        var mockLedStrip = mock(Ws281xLedStrip.class);
-        GamePUI pui = new GamePUI(controller, this.pi4j, mockLedStrip);
-        var inOrder = inOrder(mockLedStrip);
+        var mockAnimator = mockAnimator();
+        GamePUI pui = new GamePUI(controller, this.pi4j, mockAnimator);
 
         var theEdge = (Edge) pui.lookUpSegmentIdToSegment(segmentIndex);
-        var numPixels = theEdge.getEndIndex() - theEdge.getStartIndex() + 1;
 
         controller.setTippEdge(theEdge);
 
         controller.awaitCompletion();
         pui.awaitCompletion();
 
-        inOrder.verify(mockLedStrip, times(numPixels)).setPixel(anyInt(), eq(theEdge.getColor()));
-        inOrder.verify(mockLedStrip).render();
+        verify(mockAnimator, times(1)).simplyToggleSegment(theEdge, true);
         assertEquals(Color.ORANGE, model.tippEdge.getColor());
 
         controller.removeTippEdge();
@@ -197,8 +178,7 @@ public class GamePUITest extends ComponentTest {
         controller.awaitCompletion();
         pui.awaitCompletion();
 
-        inOrder.verify(mockLedStrip, times(numPixels)).setPixel(anyInt(), eq(Color.BLACK));
-        inOrder.verify(mockLedStrip).render();
+        verify(mockAnimator, times(2)).simplyToggleSegment(theEdge, false);
         assertEquals(Color.GREEN, model.tippEdge.getColor());
 
     }

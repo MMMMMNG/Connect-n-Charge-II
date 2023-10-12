@@ -9,7 +9,12 @@ import javafx.scene.media.MediaPlayer;
 public final class Sounder {
     private static Media deactivateMedia;
     private static Media activateMedia;
+
+    private static Media notificationMedia;
+
+    private static Media winMedia;
     private static boolean initialized = false;
+    private static boolean muted = false;
 
     private Sounder() {
     }
@@ -20,24 +25,49 @@ public final class Sounder {
 
         resourcePath = Sounder.class.getResource("/activate.mp3").toString();
         activateMedia = new Media(resourcePath);
+
+        resourcePath = Sounder.class.getResource("/notification.mp3").toString();
+        notificationMedia = new Media(resourcePath);
+
+        resourcePath = Sounder.class.getResource("/success.mp3").toString();
+        winMedia = new Media(resourcePath);
         initialized = true;
     }
 
     public static void playActivate() {
-        if (!initialized) {
-            return;
-        }
-        var med = new MediaPlayer(activateMedia);
-        med.setOnEndOfMedia(med::dispose);
-        med.play();
+        playMedia(activateMedia);
     }
 
     public static void playDeactivate() {
-        if (!initialized) {
+        playMedia(deactivateMedia);
+    }
+
+    public static void playNotification() {
+        playMedia(notificationMedia);
+    }
+
+    public static void playWin() {
+        playMedia(winMedia);
+    }
+
+    private static void playMedia(Media media) {
+        if (!initialized || muted) {
             return;
         }
-        var med = new MediaPlayer(deactivateMedia);
-        med.setOnEndOfMedia(med::dispose);
-        med.play();
+        var mp = new MediaPlayer(media);
+        mp.setOnEndOfMedia(() -> {
+            mp.dispose();
+        });
+        mp.setOnReady(() -> {
+            mp.play();
+        });
+    }
+
+    public static void shutdown() {
+        //not needed i guess
+    }
+
+    public static void changeMuted(boolean nV) {
+        muted = nV;
     }
 }

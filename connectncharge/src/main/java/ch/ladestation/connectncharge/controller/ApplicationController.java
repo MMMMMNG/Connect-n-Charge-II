@@ -5,7 +5,6 @@ import ch.ladestation.connectncharge.model.game.gamelogic.Game;
 import ch.ladestation.connectncharge.model.game.gamelogic.Hint;
 import ch.ladestation.connectncharge.model.game.gamelogic.Node;
 import ch.ladestation.connectncharge.pui.GamePUI;
-import ch.ladestation.connectncharge.pui.Sounder;
 import ch.ladestation.connectncharge.services.file.TextFileEditor;
 import ch.ladestation.connectncharge.util.mvcbase.ControllerBase;
 import ch.ladestation.connectncharge.util.mvcbase.ObservableArray;
@@ -21,9 +20,8 @@ import java.util.stream.Stream;
  * This Class is the controller of the element with the components.
  */
 public class ApplicationController extends ControllerBase<Game> {
-    public boolean firstBootup = true;
     private Map<Integer, List<Object>> levels;
-    private int currentLevel = 1;
+    private int currentLevel = 0;
     private GamePUI gamePUI;
     private boolean isToBeRemoved = false;
     private ScheduledExecutorService blinkingEdgeScheduler;
@@ -35,6 +33,7 @@ public class ApplicationController extends ControllerBase<Game> {
      */
     public ApplicationController(Game model) {
         super(model);
+        loadLevels();
 
         model.activatedEdges.onChange((oldValue, newValue) -> {
             if (!model.gameStarted.getValue()) {
@@ -55,14 +54,6 @@ public class ApplicationController extends ControllerBase<Game> {
                 removeHint(Hint.HINT_CYCLE);
             }
         });
-
-        model.gameStarted.onChange(((oldValue, newValue) -> {
-            if (oldValue && !newValue && !model.isFinished.getValue()) {
-                increaseCurrentLevel();
-                loadNextLevel();
-                syncSet(model.isCountdownFinished, false);
-            }
-        }));
 
         model.isTippOn.onChange(((oldValue, newValue) -> {
             if (newValue) {
@@ -229,6 +220,18 @@ public class ApplicationController extends ControllerBase<Game> {
     }
 
     /**
+     * This method is the entry point for the state machine (for the game)
+     * It starts a new round.
+     */
+    public void startRound() {
+        increaseCurrentLevel();
+        loadCurrentLevel();
+        syncSet(model.isCountdownFinished, false);
+        syncSet(model.isFinished, false);
+        startBlinkingEdge((Edge) gamePUI.lookUpSegmentIdToSegment(90));
+    }
+
+    /**
      * This method is a setter for the gamePUI.
      *
      * @param gamePUI
@@ -240,14 +243,14 @@ public class ApplicationController extends ControllerBase<Game> {
     /**
      * This method loads all the levels from the text files in a {@code Map<Integer, List<Object>>}.
      */
-    public void loadLevels() {
+    private void loadLevels() {
         levels = TextFileEditor.readLevels();
     }
 
     /**
-     * This method loads the next level.
+     * This method loads the current round.
      */
-    public void loadNextLevel() {
+    private void loadCurrentLevel() {
         List<Object> level = levels.get(currentLevel);
 
         List<List<Integer>> solution = (List<List<Integer>>) level.get(1);
@@ -255,10 +258,6 @@ public class ApplicationController extends ControllerBase<Game> {
         var solutionEdges =
             solution.stream().map((sol) -> gamePUI.lookUpEdge(sol.get(0), sol.get(1))).toArray(Edge[]::new);
         setSolution(solutionEdges);
-
-
-        startBlinkingEdge((Edge) gamePUI.lookUpSegmentIdToSegment(90));
-
     }
 
     private void instanceTerminals() {
@@ -335,12 +334,10 @@ public class ApplicationController extends ControllerBase<Game> {
 
     private void activateEdge(Edge edge) {
         syncAdd(model.activatedEdges, edge);
-        Sounder.playActivate();
     }
 
     private void deactivateEdge(Edge edge) {
         syncRemove(model.activatedEdges, edge);
-        Sounder.playDeactivate();
     }
 
     private void deactivateAllEdges() {
@@ -356,7 +353,7 @@ public class ApplicationController extends ControllerBase<Game> {
      *
      * @param edg
      */
-    public void startBlinkingEdge(Edge edg) {
+    private void startBlinkingEdge(Edge edg) {
         model.blinkingEdge = edg;
         blinkingEdgeScheduler = Executors.newScheduledThreadPool(1);
         blinkingEdgeScheduler.scheduleAtFixedRate(() -> toggleValue(model.isEdgeBlinking), 0, 1, TimeUnit.SECONDS);
@@ -468,20 +465,18 @@ public class ApplicationController extends ControllerBase<Game> {
      * This method starts the game again.
      */
     public void playAgain() {
-        syncSet(model.isFinished, false);
-        deactivateAllEdges();
-        deactivateAllNodes();
-        setGameStarted(false);
+        quitGame();
+        startRound();
     }
 
     public void quitGame() {
         deactivateAllEdges();
         deactivateAllNodes();
-        setGameStarted(false);
+        syncSet(model.gameStarted, false);
     }
 
     public void setEndTime(String endTime) {
-        log.info("seting endTime={}", model.endTime.get());
+        log.info("setting endTime={}", endTime);
         model.endTime.set(endTime);
     }
 
@@ -493,5 +488,9 @@ public class ApplicationController extends ControllerBase<Game> {
     public synchronized void removeHint(Hint hint) {
         log.trace("removing hint={}", hint);
         syncRemove(model.activeHints, hint);
+    }
+
+    public void toggleMute() {
+        syncSet(model.muted, !get(model.muted));
     }
 }

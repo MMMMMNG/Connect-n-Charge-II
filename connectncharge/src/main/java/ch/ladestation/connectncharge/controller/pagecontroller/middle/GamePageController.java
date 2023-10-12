@@ -7,7 +7,6 @@ import ch.ladestation.connectncharge.model.game.gameinfo.MyTimer;
 import ch.ladestation.connectncharge.model.game.gamelogic.Game;
 import ch.ladestation.connectncharge.model.game.gamelogic.Hint;
 import ch.ladestation.connectncharge.model.text.FilePath;
-import ch.ladestation.connectncharge.util.mvcbase.ControllerBase;
 import ch.ladestation.connectncharge.util.mvcbase.ViewMixin;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,8 +20,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class GamePageController implements ViewMixin<Game, ControllerBase<Game>>, Initializable, PageController {
+public class GamePageController implements ViewMixin<Game, ApplicationController>, Initializable, PageController {
 
+    private static String publicEndTime;
     @FXML
     private AnchorPane endGampePopupPane;
     @FXML
@@ -41,11 +41,24 @@ public class GamePageController implements ViewMixin<Game, ControllerBase<Game>>
     private Label timerLabel;
     @FXML
     private Label tippLabel;
-
-    private static String publicEndTime;
+    @FXML
+    private Button muteButton;
     private String leaveGamePath;
 
     private ApplicationController controller;
+
+    /**
+     * This method is getter for publicEndTime.
+     *
+     * @return publicEndTime
+     */
+    public static String getPublicEndTime() {
+        return publicEndTime;
+    }
+
+    public static void setPublicEndTime(String publicEndTimeParam) {
+        publicEndTime = publicEndTimeParam;
+    }
 
     /**
      * initialize
@@ -68,19 +81,6 @@ public class GamePageController implements ViewMixin<Game, ControllerBase<Game>>
         init(controller);
         this.controller = controller;
         MyTimer.setController(controller);
-    }
-
-    /**
-     * This method is getter for publicEndTime.
-     *
-     * @return publicEndTime
-     */
-    public static String getPublicEndTime() {
-        return publicEndTime;
-    }
-
-    public static void setPublicEndTime(String publicEndTimeParam) {
-        publicEndTime = publicEndTimeParam;
     }
 
     private void startTimer() {
@@ -195,13 +195,8 @@ public class GamePageController implements ViewMixin<Game, ControllerBase<Game>>
         }));
         onChangeOf(model.isFinished).execute((oldValue, newValue) -> {
             if (!oldValue && newValue) {
-                try {
-                    endGame();
-                    StageHandler.openStage(FilePath.ENDSCREEN.getFilePath());
-                    //controller.finishGame();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                endGame();
+                StageHandler.openStage(FilePath.ENDSCREEN.getFilePath());
             }
         });
         onChangeOf(model.activeHint).execute(((oldValue, newValue) -> {
@@ -213,6 +208,15 @@ public class GamePageController implements ViewMixin<Game, ControllerBase<Game>>
             tippLabel.setText(newValue.getText());
             hintPopupPane.setVisible(true);
         }));
+
+        onChangeOf(model.muted).convertedBy(b -> b ? "Unmute" : "Mute").update(muteButton.textProperty());
+    }
+
+    @Override
+    public void setupUiToActionBindings(ApplicationController controller) {
+        muteButton.setOnMouseClicked(m -> {
+            controller.toggleMute();
+        });
     }
 
     private void closeHintPopup() {

@@ -73,11 +73,6 @@ public class EdgeClickScreenController implements ViewMixin<Game, ControllerBase
     @Override
     public void setController(ApplicationController controller) {
         init(controller);
-        controller.loadLevels();
-        if (controller.firstBootup) {
-            controller.loadNextLevel();
-            controller.firstBootup = false;
-        }
     }
 
     @Override
@@ -104,11 +99,7 @@ public class EdgeClickScreenController implements ViewMixin<Game, ControllerBase
     public void setupModelToUiBindings(Game model) {
         onChangeOf(model.gameStarted).execute(((oldValue, newValue) -> {
             if (!oldValue && newValue) {
-                try {
-                    StageHandler.openStage(FilePath.COUNTDOWNPAGE.getFilePath());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                StageHandler.openStage(FilePath.COUNTDOWNPAGE.getFilePath());
             }
         }));
     }

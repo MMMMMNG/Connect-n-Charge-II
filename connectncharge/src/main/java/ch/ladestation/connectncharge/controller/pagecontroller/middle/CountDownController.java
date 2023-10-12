@@ -12,7 +12,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -52,12 +51,8 @@ public class CountDownController implements ViewMixin<Game, ControllerBase<Game>
                     });
                 } else if (countdownStarter < 0) {
                     Platform.runLater(() -> {
-                        try {
-                            StageHandler.openStage(FilePath.GAMEPAGE.getFilePath());
-                            controller.setCountdownFinished();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                        StageHandler.openStage(FilePath.GAMEPAGE.getFilePath());
+                        controller.setCountdownFinished();
                     });
                     scheduler.shutdown();
                 }

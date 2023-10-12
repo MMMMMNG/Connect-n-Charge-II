@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 // import ch.ladestation.connectncharge.model.Node;
@@ -30,9 +29,7 @@ public class NodeTest {
         var cut = new Node(1, 2, 3);
 
         cut.setColor(mockedColor);
-        cut.setOn(true);
 
         assertEquals(mockedColor, cut.getColor());
-        assertTrue(cut.isOn());
     }
 }

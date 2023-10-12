@@ -9,6 +9,8 @@ import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -16,6 +18,7 @@ import java.io.IOException;
  * This class handles the stage change.
  */
 public final class StageHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StageHandler.class);
 
     private static final String STAGE_TITLE = "Connect 'n Charge";
 
@@ -29,9 +32,15 @@ public final class StageHandler {
     }
 
 
-    public static void openStage(String fxmlPath) throws IOException {
+    public static void openStage(String fxmlPath) {
         FXMLLoader fxmlLoader = new FXMLLoader(AppStarter.class.getResource(fxmlPath));
-        Parent root = fxmlLoader.load();
+        Parent root;
+        try {
+            root = fxmlLoader.load();
+        } catch (IOException e) {
+            LOGGER.error("exception when trying to load the fxmlLoader. Terrible.", e);
+            return;
+        }
         Scene scene = new Scene(root);
         PageController pageController = fxmlLoader.getController();
         pageController.setController(controller);
@@ -51,7 +60,6 @@ public final class StageHandler {
 
         if (stage.getScene() != null) {
             stage.setMaximized(true);
-            //stage.setFullScreen(true);
         }
 
         stage.show();
@@ -61,15 +69,15 @@ public final class StageHandler {
         return lastFxmlPath;
     }
 
+    public static void setLastFxmlPath(String lastFxmlPathParam) {
+        lastFxmlPath = lastFxmlPathParam;
+    }
+
     public static void setStage(Stage stageParam) {
         stage = stageParam;
     }
 
     public static void setController(ApplicationController controllerParam) {
         controller = controllerParam;
-    }
-
-    public static void setLastFxmlPath(String lastFxmlPathParam) {
-        lastFxmlPath = lastFxmlPathParam;
     }
 }

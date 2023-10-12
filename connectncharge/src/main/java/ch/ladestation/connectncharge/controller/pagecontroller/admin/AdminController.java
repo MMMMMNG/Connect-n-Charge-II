@@ -16,45 +16,33 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 
-import java.io.IOException;
 import java.util.List;
 
 public class AdminController implements ViewMixin<Game, ControllerBase<Game>>, PageController {
 
+    private static final String ADMIN_CODE = "123456";
     @FXML
     private TextField textField1;
-
     @FXML
     private TextField textField2;
-
     @FXML
     private TextField textField3;
-
     @FXML
     private TextField textField4;
-
     @FXML
     private TextField textField5;
-
     @FXML
     private TextField textField6;
-
     @FXML
     private GridPane keypadGridPane;
-
     @FXML
     private AnchorPane codeBackground;
-
     @FXML
     private Button deleteButton;
-
     @FXML
     private Button stopButton;
-
     @FXML
     private Label errorMessage;
-
-    private static final String ADMIN_CODE = "123456";
     private TextField[] textFields;
 
     public void initialize() {
@@ -116,11 +104,7 @@ public class AdminController implements ViewMixin<Game, ControllerBase<Game>>, P
                 textField5.getText(), textField6.getText());
 
         if (enteredCode.equals(ADMIN_CODE)) {
-            try {
-                StageHandler.openStage(FilePath.ADMINHOMEPAGE.getFilePath());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            StageHandler.openStage(FilePath.ADMINHOMEPAGE.getFilePath());
         } else {
             errorMessage.setText("Falscher Code");
             errorMessage.setVisible(true);
@@ -133,13 +117,9 @@ public class AdminController implements ViewMixin<Game, ControllerBase<Game>>, P
 
     @FXML
     private void onStopButtonClicked(ActionEvent event) {
-        try {
-            String fxmlPath = StageHandler.getLastFxmlPath() != null ? StageHandler.getLastFxmlPath()
-                : FilePath.HOMEPAGE.getFilePath();
-            StageHandler.openStage(fxmlPath);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        String fxmlPath = StageHandler.getLastFxmlPath() != null ? StageHandler.getLastFxmlPath()
+            : FilePath.HOMEPAGE.getFilePath();
+        StageHandler.openStage(fxmlPath);
     }
 
     @Override

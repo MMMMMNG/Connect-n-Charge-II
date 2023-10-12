@@ -5,9 +5,9 @@ import ch.ladestation.connectncharge.model.game.gamelogic.Game;
 import ch.ladestation.connectncharge.model.game.gamelogic.Hint;
 import ch.ladestation.connectncharge.model.game.gamelogic.Node;
 import ch.ladestation.connectncharge.pui.GamePUI;
+import ch.ladestation.connectncharge.pui.LEDAnimator;
 import ch.ladestation.connectncharge.util.Pi4JContext;
 import ch.ladestation.connectncharge.util.mvcbase.ObservableArray;
-import com.github.mbelling.ws281x.Ws281xLedStrip;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,6 +57,10 @@ class ApplicationControllerTest {
         );
     }
 
+    private LEDAnimator mockAnimator() {
+        return mock(LEDAnimator.class);
+    }
+
     @Test
     @DisplayName("Verify that edges are being toggled")
     public void verifyTogglingOfEdges() {
@@ -72,9 +76,6 @@ class ApplicationControllerTest {
         cut.edgePressed(edge);
         cut.awaitCompletion();
         //then
-        verify(edge, times(1)).on();
-        verify(edge, times(0)).setOn(false);
-        verify(edge, times(0)).off();
         assertArrayEquals(new Edge[] {edge}, model.activatedEdges.getValues());
         verify(mockedListener).update(new Edge[0], new Edge[] {edge});
     }
@@ -93,7 +94,7 @@ class ApplicationControllerTest {
         }
     }
 
-    private Edge[] mockGraph(int[][] fromAndToNodes) {
+    private static Edge[] mockGraph(int[][] fromAndToNodes) {
         var ret = new ArrayList<Edge>();
         var nodes = new HashMap<Integer, Node>();
 
@@ -129,13 +130,11 @@ class ApplicationControllerTest {
         model = new Game();
         controller = new ApplicationController(model);
 
-        var mockLedStrip = mock(Ws281xLedStrip.class);
-        pui = new GamePUI(controller, Pi4JContext.createMockContext(), mockLedStrip);
+        pui = new GamePUI(controller, Pi4JContext.createMockContext(), mockAnimator());
         controller.setGPUI(pui);
-        controller.loadLevels();
         assertArrayEquals(new Edge[0], model.solution.getValues());
 
-        controller.loadNextLevel();
+        controller.startRound();
         controller.edgePressed(model.blinkingEdge);
         controller.awaitCompletion();
         controller.setCountdownFinished();
@@ -165,6 +164,41 @@ class ApplicationControllerTest {
         //then
         assertEquals(Hint.HINT_EMPTY_HINT, model.activeHint.getValue());
         assertArrayEquals(new Hint[0], model.activeHints.getValues());
+    }
+
+    @ParameterizedTest
+    @DisplayName("Test that allTerminalsConnected() works")
+    @MethodSource("sourceAllTerminalsConnected")
+    public void allTerminalsConnected(Edge[] arr, Node[] term, boolean wantedRes) {
+        assertEquals(wantedRes, ApplicationController.allTerminalsConnected(arr, term));
+    }
+
+    public static Stream<Arguments> sourceAllTerminalsConnected() {
+        var simpleHappy = mockGraph(new int[][] {{1, 2}});
+        var simpleHappyTerms = new Node[] {simpleHappy[0].getFromNode(), simpleHappy[0].getToNode()};
+        var forked = mockGraph(new int[][] {{1, 2}, {3, 2}, {2, 4}, {4, 5}, {5, 6}, {6, 7}, {6, 8}});
+        var forkedTerms = new Node[] {forked[0].getFromNode(), forked[1].getFromNode(), forked[5].getToNode(),
+            forked[6].getToNode()};
+        var twoCyc = mockGraph(
+            new int[][] {{1, 2}, {2, 3}, {3, 4}, {4, 1}, {1, 20}, {20, 30}, {30, 81}, {81, 82}, {82, 83}, {83, 84},
+                {84, 81}});
+        var twoCycTerms =
+            new Node[] {twoCyc[0].getFromNode(), twoCyc[3].getToNode(), twoCyc[6].getToNode(), twoCyc[9].getToNode()};
+
+        var simpleUnhappy = mockGraph(new int[][] {{1, 2}, {99, 100}});
+        var simpleUnhappyTerms = new Node[] {simpleUnhappy[0].getFromNode(), simpleUnhappy[1].getToNode()};
+        var twoCycUnhappy = mockGraph(
+            new int[][] {{1, 2}, {2, 3}, {3, 4}, {4, 1}, {1, 20}, {20, 999}, {30, 81}, {81, 82}, {82, 83}, {83, 84},
+                {84, 81}});
+        var twoCycUnhappyTerms =
+            new Node[] {twoCyc[0].getFromNode(), twoCyc[3].getToNode(), twoCyc[6].getToNode(), twoCyc[9].getToNode()};
+        return Stream.of(
+            Arguments.of(simpleHappy, simpleHappyTerms, true),
+            Arguments.of(forked, forkedTerms, true),
+            Arguments.of(twoCyc, twoCycTerms, true),
+            Arguments.of(simpleUnhappy, simpleUnhappyTerms, false),
+            Arguments.of(twoCycUnhappy, twoCycUnhappyTerms, false)
+        );
     }
 
     @Test
