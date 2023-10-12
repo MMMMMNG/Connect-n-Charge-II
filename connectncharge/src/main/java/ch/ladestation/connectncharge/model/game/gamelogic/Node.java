@@ -12,4 +12,9 @@ public class Node extends Segment {
     public String toString() {
         return "(" + getSegmentIndex() + ")";
     }
+
+    @Override
+    public boolean isOn() {
+        return activeTerminalsContains(this);
+    }
 }

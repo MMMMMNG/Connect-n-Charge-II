@@ -50,4 +50,9 @@ public class Edge extends Segment {
     public String toString() {
         return getFromNodeId() + "<-" + getSegmentIndex() + "->" + getToNodeId();
     }
+
+    @Override
+    public boolean isOn() {
+        return activeEdgesContains(this);
+    }
 }

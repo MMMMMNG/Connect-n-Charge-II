@@ -33,18 +33,10 @@ public class Game {
     public StringProperty endTime = new SimpleStringProperty("");
 
     public Game() {
-        //inherently syncing "two sources of truth":
-        //this way the instance state is dependent on the model state
-        //and therefore weird bugs where the two are contradictory are
-        //eradicated (I hope)
-        activatedEdges.onChange((oldValues, newValues) -> {
-            for (var ed : oldValues) {
-                ed.off();
-            }
-            for (var ed : newValues) {
-                ed.on();
-            }
-        });
+        //set these so instances can look up whether they're active on their own,
+        //and also prevent any annoying async bugs.
+        Segment.setActiveTerminalsRef(terminals);
+        Segment.setActiveEdgesRef(activatedEdges);
 
         setupLogging(solution, "solution");
         setupLogging(activatedEdges, "activatedEdges");

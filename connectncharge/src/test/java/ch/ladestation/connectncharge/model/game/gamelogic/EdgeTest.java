@@ -4,9 +4,7 @@ import com.github.mbelling.ws281x.Color;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class EdgeTest {
@@ -45,9 +43,7 @@ public class EdgeTest {
         var cut = new Edge(1, 2, 3, 4, 5, 6);
 
         cut.setColor(mockedColor);
-        cut.setOn(true);
 
         assertEquals(mockedColor, cut.getColor());
-        assertTrue(cut.isOn());
     }
 }

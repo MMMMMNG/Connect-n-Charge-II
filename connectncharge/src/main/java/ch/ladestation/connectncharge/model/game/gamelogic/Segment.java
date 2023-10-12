@@ -1,24 +1,22 @@
 package ch.ladestation.connectncharge.model.game.gamelogic;
 
+import ch.ladestation.connectncharge.pui.Component;
+import ch.ladestation.connectncharge.util.mvcbase.ObservableArray;
 import com.github.mbelling.ws281x.Color;
 
-import ch.ladestation.connectncharge.pui.Component;
+import java.util.Arrays;
 
 public abstract class Segment extends Component {
-
-    public static final String HOUSE_FLAG = "H";
-
+    private static ObservableArray<Edge> modelActiveEdgesReference;
+    private static ObservableArray<Node> modelActiveTerminalsReference;
     /**
      * the segment index according to LEDSegments.csv
      */
     private final int segmentIndex;
-
-
     /**
      * The start pixel of this edge
      */
     private final int startIndex;
-
     /**
      * The end pixel of this edge
      */
@@ -27,10 +25,6 @@ public abstract class Segment extends Component {
      * The color this segment should display
      */
     private Color color = Color.GREEN;
-    /**
-     * Whether this edge is shining
-     */
-    private boolean isOn = false;
 
     /**
      * Basic constructor for the {@code Edge} class
@@ -47,6 +41,21 @@ public abstract class Segment extends Component {
         this.color = color;
     }
 
+    public static void setActiveEdgesRef(ObservableArray<Edge> ref) {
+        modelActiveEdgesReference = ref;
+    }
+
+    public static void setActiveTerminalsRef(ObservableArray<Node> ref) {
+        modelActiveTerminalsReference = ref;
+    }
+
+    protected static boolean activeTerminalsContains(Node node) {
+        return Arrays.asList(modelActiveTerminalsReference.getValues()).contains(node);
+    }
+
+    protected static boolean activeEdgesContains(Edge edge) {
+        return Arrays.asList(modelActiveEdgesReference.getValues()).contains(edge);
+    }
 
     public int getStartIndex() {
         return startIndex;
@@ -56,35 +65,17 @@ public abstract class Segment extends Component {
         return endIndex;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
     public Color getColor() {
         return color;
     }
 
-    public boolean isOn() {
-        return isOn;
+    public void setColor(Color color) {
+        this.color = color;
     }
 
-    public void setOn(boolean on) {
-        isOn = on;
-    }
-
-    public void on() {
-        setOn(true);
-    }
-
-    public void off() {
-        setOn(false);
-    }
+    public abstract boolean isOn();
 
     public int getSegmentIndex() {
         return segmentIndex;
-    }
-
-    public interface SegmentStateChange {
-        void onStateChange(int deltaCost);
     }
 }
