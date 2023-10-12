@@ -48,10 +48,11 @@ public class LEDAnimator {
                 }
             }
             render(ledStates, stripRef);
-        }
-        if (!activeAnims.isEmpty()) {
-            LOGGER.trace("scheduled new frame");
-            executorService.submit(this::frameTick);
+
+            if (!activeAnims.isEmpty()) {
+                LOGGER.trace("scheduled new frame");
+                executorService.submit(this::frameTick);
+            }
         }
     }
 
@@ -85,26 +86,26 @@ public class LEDAnimator {
     public void scheduleEdgesToBeAnimated(Edge[] oldValues, Edge[] newValues) {
         var oldList = new ArrayList<>(Arrays.asList(oldValues));
         var newList = new ArrayList<>(Arrays.asList(newValues));
-        if (oldValues.length > newValues.length) {
-            oldList.removeAll(newList);
-            instantiateAnims(oldList, true);
-        } else if (oldValues.length < newValues.length) {
-            newList.removeAll(oldList);
-            instantiateAnims(newList, false);
-        }
-        if (!activeAnims.isEmpty()) {
-            executorService.submit(this::frameTick);
+        synchronized (ledStates) {
+            if (oldValues.length > newValues.length) {
+                oldList.removeAll(newList);
+                instantiateAnims(oldList, true);
+            } else if (oldValues.length < newValues.length) {
+                newList.removeAll(oldList);
+                instantiateAnims(newList, false);
+            }
+            if (!activeAnims.isEmpty()) {
+                executorService.submit(this::frameTick);
+            }
         }
     }
 
     public void instantiateAnims(List<Edge> newList, boolean dissappear) {
-        synchronized (ledStates) {
-            for (var edg : newList) {
-                if (activeAnims.stream().anyMatch(a -> a.getAssociatedEdge() == edg)) {
-                    continue;
-                }
-                activeAnims.add(new WipeFromCenterAnimation(edg, dissappear));
+        for (var edg : newList) {
+            if (activeAnims.stream().anyMatch(a -> a.getAssociatedEdge() == edg)) {
+                continue;
             }
+            activeAnims.add(new WipeFromCenterAnimation(edg, dissappear));
         }
     }
 

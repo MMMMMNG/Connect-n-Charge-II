@@ -29,7 +29,9 @@
           </option>
           <option name="jreName" value="17" />
           <option name="mavenProperties">
-            <map />
+            <map>
+              <entry key="chekstyle.skip" value="true" />
+            </map>
           </option>
           <option name="passParentEnv" value="true" />
           <option name="runMavenInBackground" value="true" />

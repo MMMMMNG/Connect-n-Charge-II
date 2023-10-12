@@ -130,6 +130,8 @@ public class GamePUI extends PuiBase<Game, ApplicationController> {
                 Sounder.playWin();
             }
         }));
+
+        onChangeOf(model.muted).execute((oV, nV) -> Sounder.changeMuted(nV));
     }
 
     /**

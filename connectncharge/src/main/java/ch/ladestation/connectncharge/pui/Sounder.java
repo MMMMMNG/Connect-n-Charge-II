@@ -14,6 +14,7 @@ public final class Sounder {
 
     private static Media winMedia;
     private static boolean initialized = false;
+    private static boolean muted = false;
 
     private Sounder() {
     }
@@ -50,7 +51,7 @@ public final class Sounder {
     }
 
     private static void playMedia(Media media) {
-        if (!initialized) {
+        if (!initialized || muted) {
             return;
         }
         var mp = new MediaPlayer(media);
@@ -64,5 +65,9 @@ public final class Sounder {
 
     public static void shutdown() {
         //not needed i guess
+    }
+
+    public static void changeMuted(boolean nV) {
+        muted = nV;
     }
 }

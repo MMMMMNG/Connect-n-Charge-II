@@ -25,6 +25,8 @@ public class Game {
     public final ObservableValue<Boolean> hasCycle = new ObservableValue<>(false);
     public final ObservableValue<Hint> activeHint = new ObservableValue<>(Hint.HINT_EMPTY_HINT);
     public final ObservableArray<Hint> activeHints = new ObservableArray<>(new Hint[0]);
+
+    public final ObservableValue<Boolean> muted = new ObservableValue<>(false);
     public Edge tippEdge = null;
     public Edge blinkingEdge = null;
     public boolean ignoringInputs = false;

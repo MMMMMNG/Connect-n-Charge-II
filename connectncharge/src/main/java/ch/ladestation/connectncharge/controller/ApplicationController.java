@@ -489,4 +489,8 @@ public class ApplicationController extends ControllerBase<Game> {
         log.trace("removing hint={}", hint);
         syncRemove(model.activeHints, hint);
     }
+
+    public void toggleMute() {
+        syncSet(model.muted, !get(model.muted));
+    }
 }
