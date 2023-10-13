@@ -88,12 +88,14 @@ public class EndScreenController implements Initializable, ViewMixin<Game, Contr
 
     @FXML
     private void handleAdminButton(ActionEvent event) throws IOException {
+        controller.quitGame();
         StageHandler.setLastFxmlPath(FilePath.HOMEPAGE.getFilePath());
         StageHandler.openStage(FilePath.ADMINPAGE.getFilePath());
     }
 
     @FXML
     private void handleHighScoreButton(ActionEvent event) throws IOException {
+        controller.quitGame();
         StageHandler.openStage(FilePath.HIGHSCORE.getFilePath());
     }
 

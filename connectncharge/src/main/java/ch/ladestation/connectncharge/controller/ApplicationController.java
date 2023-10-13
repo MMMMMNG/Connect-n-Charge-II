@@ -295,10 +295,8 @@ public class ApplicationController extends ControllerBase<Game> {
         async(() -> {
             if (!get(model.gameStarted)) {
                 if (edge == model.blinkingEdge) {
-                    syncSet(model.isEdgeBlinking, false);
-                    blinkingEdgeScheduler.shutdown();
+                    stopBlinkingTheEdge();
                     syncSet(model.gameStarted, true);
-                    model.blinkingEdge = null;
                     startIgnoringInputs();
                 }
                 return;
@@ -312,6 +310,12 @@ public class ApplicationController extends ControllerBase<Game> {
             removeTippEdge();
             toggleEdge(edge);
         });
+    }
+
+    private void stopBlinkingTheEdge() {
+        syncSet(model.isEdgeBlinking, false);
+        blinkingEdgeScheduler.shutdown();
+        async(() -> model.blinkingEdge = null);
     }
 
     /**
@@ -473,6 +477,7 @@ public class ApplicationController extends ControllerBase<Game> {
     public void quitGame() {
         deactivateAllEdges();
         deactivateAllNodes();
+        stopBlinkingTheEdge();
         syncSet(model.gameStarted, false);
     }
 

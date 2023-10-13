@@ -23,6 +23,7 @@ public class EdgeClickScreenController implements ViewMixin<Game, ControllerBase
     private AnchorPane menuPane;
     @FXML
     private AnchorPane shadowPane;
+    private ApplicationController controller;
 
     @FXML
     public void handleNextButton(ActionEvent event) throws IOException {
@@ -37,12 +38,14 @@ public class EdgeClickScreenController implements ViewMixin<Game, ControllerBase
 
     @FXML
     private void handleAdminButton(ActionEvent event) throws IOException {
-        StageHandler.setLastFxmlPath(FilePath.EDGECLICKSCREEN.getFilePath());
+        controller.quitGame();
+        StageHandler.setLastFxmlPath(FilePath.HOMEPAGE.getFilePath());
         StageHandler.openStage(FilePath.ADMINPAGE.getFilePath());
     }
 
     @FXML
     private void handleHighScoreButton(ActionEvent event) throws IOException {
+        controller.quitGame();
         StageHandler.openStage(FilePath.HIGHSCORE.getFilePath());
     }
 
@@ -73,6 +76,7 @@ public class EdgeClickScreenController implements ViewMixin<Game, ControllerBase
     @Override
     public void setController(ApplicationController controller) {
         init(controller);
+        this.controller = controller;
     }
 
     @Override
