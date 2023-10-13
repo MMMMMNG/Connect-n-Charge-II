@@ -250,7 +250,7 @@
                   <Font size="24.0" />
                </font>
                <VBox.margin>
-                  <Insets right="40.0" />
+                  <Insets />
                </VBox.margin>
             </Label>
             <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="1433.0" prefHeight="22.0" prefWidth="600.0" text="Christoph Biel              PCB-Design Consulting" textFill="WHITE">
@@ -258,23 +258,28 @@
                   <Font size="24.0" />
                </font>
                <VBox.margin>
-                  <Insets right="40.0" />
+                  <Insets />
                </VBox.margin>
+            </Label>
+            <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="1458.0" prefHeight="22.0" prefWidth="600.0" text="Mauro Tammaro                              3D-Printing" textFill="WHITE">
+               <font>
+                  <Font size="24.0" />
+               </font>
             </Label>
             <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="1609.0" prefHeight="22.0" prefWidth="600.0" text="Christine Enggist       Ordering of second edition" textFill="WHITE">
                <font>
                   <Font size="24.0" />
                </font>
                <VBox.margin>
-                  <Insets right="40.0" />
+                  <Insets />
                </VBox.margin>
             </Label>
-            <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="1589.0" prefHeight="22.0" prefWidth="600.0" text="Friedrich-Wilhelm                           Team-Coach" textFill="WHITE">
+            <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="1589.0" prefHeight="22.0" prefWidth="600.0" text="Friedrich-Wilhelm                            Team-Coach" textFill="WHITE">
                <font>
                   <Font size="24.0" />
                </font>
                <VBox.margin>
-                  <Insets right="40.0" />
+                  <Insets />
                </VBox.margin>
             </Label>
             <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="1680.0" prefHeight="22.0" prefWidth="600.0" text="Rademacher                                                    " textFill="WHITE">
@@ -367,7 +372,7 @@
                   <Font name="System Italic" size="24.0" />
                </font>
                <VBox.margin>
-                  <Insets top="50.0" />
+                  <Insets top="25.0" />
                </VBox.margin>
             </Label>
             <HBox prefHeight="100.0" prefWidth="200.0">
@@ -427,6 +432,19 @@
                   </VBox>
                </children>
             </HBox>
+            <Label alignment="CENTER" layoutX="10.0" layoutY="2491.0" prefHeight="22.0" prefWidth="600.0" text="Music: &quot;Catch it&quot;" textFill="WHITE">
+               <font>
+                  <Font name="System Italic" size="18.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+            </Label>
+            <Label alignment="CENTER" layoutX="10.0" layoutY="2798.0" prefHeight="22.0" prefWidth="600.0" text="by Yrii Semchyshyn from Pixabay" textFill="WHITE">
+               <font>
+                  <Font name="System Italic" size="18.0" />
+               </font>
+            </Label>
          </children>
       </VBox>
     </children>
