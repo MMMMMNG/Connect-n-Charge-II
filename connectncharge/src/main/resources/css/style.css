@@ -560,6 +560,11 @@
     -fx-background-image: url(.././images/cup.png);
 }
 
+.menu-pane .info-icon-credits {
+    -fx-background-image: url(.././images/credits.png);
+    -fx-background-size: contain;
+}
+
 .menu-pane .info-icon-medalstar {
     -fx-background-image: url(.././images/medalstar.png);
 }

@@ -64,6 +64,12 @@ public class HomePageController implements ViewMixin<Game, ControllerBase<Game>>
         menuPane.setOpacity(0);
     }
 
+    @FXML
+    private void handleCreditsButton(ActionEvent event){
+        StageHandler.setLastFxmlPath(FilePath.HOMEPAGE.getFilePath());
+        StageHandler.openStage(FilePath.CREDITS.getFilePath());
+    }
+
     @Override
     public void setController(ApplicationController controller) {
         init(controller);

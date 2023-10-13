@@ -3,6 +3,8 @@ package ch.ladestation.connectncharge.model.text;
 import java.io.File;
 
 public enum FilePath {
+
+    CREDITS("/ch/ladestation/connectncharge/credits.fxml"),
     LOADINGPAGE("/ch/ladestation/connectncharge/loadingpage.fxml"),
     HOMEPAGE("/ch/ladestation/connectncharge/homepage.fxml"),
     EDGECLICKSCREEN("/ch/ladestation/connectncharge/edgeclickscreen.fxml"),

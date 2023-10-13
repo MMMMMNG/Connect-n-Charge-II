@@ -117,6 +117,25 @@
                   <String fx:value="hidden-button" />
                </styleClass>
                 </Button>
+            <Button layoutX="42.0" layoutY="378.0" maxHeight="43.0" maxWidth="165.0" mnemonicParsing="false" onAction="#handleCreditsButton" prefHeight="43.0" prefWidth="165.0" stylesheets="@../../../css/style.css" text="Credits">
+               <font>
+                  <Font name="Arial Bold" size="18.0" />
+               </font>
+               <styleClass>
+                  <String fx:value="info-text" />
+                  <String fx:value="hidden-button" />
+               </styleClass>
+            </Button>
+            <Button layoutX="14.0" layoutY="386.0" maxHeight="236.0" maxWidth="68.0" minWidth="46.0" mnemonicParsing="false" onAction="#handleCreditsButton" prefHeight="67.0" prefWidth="99.0" stylesheets="@../../../css/style.css">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+               <styleClass>
+                  <String fx:value="info-icon-credits" />
+                  <String fx:value="info-icon-size" />
+                  <String fx:value="hidden-button" />
+               </styleClass>
+            </Button>
             </children>
         </AnchorPane>
     </children>
