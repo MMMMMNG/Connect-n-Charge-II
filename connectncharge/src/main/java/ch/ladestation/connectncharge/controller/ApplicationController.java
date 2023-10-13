@@ -298,6 +298,7 @@ public class ApplicationController extends ControllerBase<Game> {
                     syncSet(model.isEdgeBlinking, false);
                     blinkingEdgeScheduler.shutdown();
                     syncSet(model.gameStarted, true);
+                    model.blinkingEdge = null;
                     startIgnoringInputs();
                 }
                 return;
