@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
 
 public class CreditsController implements ViewMixin<Game, ControllerBase<Game>>, Initializable, PageController {
 
-    public static final int CREDITS_HEIGHT = 2874 - 150;
+    public static final int CREDITS_HEIGHT = 2874 - 120;
     public static final Duration CREDIT_WATCHTIME = Duration.minutes(1.2);
     @FXML
     VBox creditBox;
