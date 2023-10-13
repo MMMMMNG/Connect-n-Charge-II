@@ -13,6 +13,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -26,14 +28,15 @@ public class CreditsController implements ViewMixin<Game, ControllerBase<Game>>,
     public static final Duration CREDIT_WATCHTIME = Duration.minutes(1.2);
     @FXML
     VBox creditBox;
-
     TranslateTransition trans;
+    private MediaPlayer mp;
 
     public CreditsController() {
     }
 
     @FXML
     private void handleXCloseButton(ActionEvent event) throws IOException {
+        mp.dispose();
         String fxmlPath =
             StageHandler.getLastFxmlPath() != null ? StageHandler.getLastFxmlPath() : FilePath.HOMEPAGE.getFilePath();
         StageHandler.openStage(fxmlPath);
@@ -59,11 +62,16 @@ public class CreditsController implements ViewMixin<Game, ControllerBase<Game>>,
         trans = new TranslateTransition(CREDIT_WATCHTIME, creditBox);
         trans.setByY(-CREDITS_HEIGHT);
         trans.setInterpolator(Interpolator.EASE_OUT);
+        mp = new MediaPlayer(new Media(getClass().getResource("/CatchItByYriiSemchyshyn.mp3").toString()));
         trans.playFromStart();
+        mp.setOnReady(() -> {
+            mp.play();
+        });
     }
 
     @Override
     public void initializeParts() {
     }
+
 }
 
