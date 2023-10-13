@@ -65,7 +65,7 @@ public class HomePageController implements ViewMixin<Game, ControllerBase<Game>>
     }
 
     @FXML
-    private void handleCreditsButton(ActionEvent event){
+    private void handleCreditsButton(ActionEvent event) {
         StageHandler.setLastFxmlPath(FilePath.HOMEPAGE.getFilePath());
         StageHandler.openStage(FilePath.CREDITS.getFilePath());
     }

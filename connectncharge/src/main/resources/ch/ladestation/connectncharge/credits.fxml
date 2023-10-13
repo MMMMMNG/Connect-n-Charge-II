@@ -16,21 +16,29 @@
                 <Button maxHeight="394.0" maxWidth="278.0" mnemonicParsing="false" onAction="#handleXCloseButton" opacity="0.0" prefHeight="394.0" prefWidth="278.0" styleClass="standard-xclose-button" stylesheets="@../../../css/style.css" textFill="#ffffff00" fx:id="x_close" />
             </children>
         </StackPane>
-      <VBox layoutX="100.0" layoutY="480.0" prefHeight="2720.0" prefWidth="624.0">
+      <VBox fx:id="creditBox" layoutX="100.0" layoutY="480.0" prefHeight="2874.0" prefWidth="624.0">
          <children>
               <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="70.0" prefWidth="600.0" text="Credits" textAlignment="CENTER" textFill="WHITE">
                   <font>
                       <Font size="40.0" />
                   </font>
               </Label>
-            <Label alignment="CENTER" prefHeight="25.0" prefWidth="604.0" text="Connect 'n Charge was developed by a group of 8 Students at FHNW." textFill="WHITE">
+            <Label alignment="CENTER" layoutX="10.0" layoutY="105.0" prefHeight="25.0" prefWidth="604.0" text="Connect 'n Charge was developed" textFill="WHITE">
+               <font>
+                  <Font name="System Italic" size="18.0" />
+               </font>
                <VBox.margin>
-                  <Insets bottom="50.0" top="25.0" />
+                  <Insets top="25.0" />
+               </VBox.margin>
+            </Label>
+            <Label alignment="CENTER" prefHeight="25.0" prefWidth="604.0" text="by a group of 8 Students at FHNW." textFill="WHITE">
+               <VBox.margin>
+                  <Insets bottom="50.0" />
                </VBox.margin>
                <font>
                   <Font name="System Italic" size="18.0" />
                </font></Label>
-            <ImageView fitHeight="600.0" fitWidth="624.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="600.0" fitWidth="625.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../../images/Connect'nChargeTeam.jpg" />
                </image>
@@ -47,15 +55,23 @@
             </Label>
             <HBox prefHeight="311.0" prefWidth="600.0">
                <children>
-                  <VBox prefHeight="200.0" prefWidth="200.0">
+                  <VBox prefHeight="200.0" prefWidth="180.0">
                      <children>
-                        <Label prefHeight="25.0" prefWidth="600.0" text="Role" textFill="WHITE">
+                        <Label prefHeight="25.0" prefWidth="600.0" text="Members" textFill="WHITE">
                            <VBox.margin>
-                              <Insets bottom="10.0" />
+                              <Insets />
                            </VBox.margin>
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font>
+                        </Label>
+                        <Label layoutX="10.0" layoutY="10.0" prefHeight="25.0" prefWidth="600.0" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
                         </Label>
                         <Label prefWidth="600.0" text="Marius Gebhardt" textFill="WHITE">
                            <padding>
@@ -99,15 +115,23 @@
                         </Label>
                      </children>
                   </VBox>
-                  <VBox layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0">
+                  <VBox layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="210.0">
                      <children>
-                        <Label prefHeight="25.0" prefWidth="600.0" text="Semester 1" textFill="WHITE">
+                        <Label prefHeight="25.0" prefWidth="600.0" text="Roles" textFill="WHITE">
                            <VBox.margin>
-                              <Insets bottom="10.0" />
+                              <Insets />
                            </VBox.margin>
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font>
+                        </Label>
+                        <Label layoutX="10.0" layoutY="10.0" prefHeight="25.0" prefWidth="600.0" text="Semester 1" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
                         </Label>
                         <Label prefWidth="600.0" text="Developer+Test Manager" textFill="WHITE">
                            <VBox.margin>
@@ -151,15 +175,23 @@
                         </Label>
                      </children>
                   </VBox>
-                  <VBox layoutX="110.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0">
+                  <VBox layoutX="110.0" layoutY="10.0" prefHeight="200.0" prefWidth="210.0">
                      <children>
-                        <Label prefHeight="25.0" prefWidth="600.0" text="Semester 2" textFill="WHITE">
+                        <Label prefHeight="25.0" prefWidth="600.0" textFill="WHITE">
                            <VBox.margin>
-                              <Insets bottom="10.0" />
+                              <Insets />
                            </VBox.margin>
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font>
+                        </Label>
+                        <Label layoutX="10.0" layoutY="10.0" prefHeight="25.0" prefWidth="600.0" text="Semester 2" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
                         </Label>
                         <Label prefWidth="600.0" text="Software Architect" textFill="WHITE">
                            <VBox.margin>
@@ -171,7 +203,7 @@
                               <Insets bottom="2.0" top="2.0" />
                            </VBox.margin>
                         </Label>
-                        <Label prefWidth="600.0" text="Requirements Engineer" textFill="WHITE">
+                        <Label text="Requirements Engineer" textFill="WHITE">
                            <VBox.margin>
                               <Insets bottom="2.0" top="2.0" />
                            </VBox.margin>
@@ -237,7 +269,7 @@
                   <Insets right="40.0" />
                </VBox.margin>
             </Label>
-            <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="1589.0" prefHeight="22.0" prefWidth="600.0" text="Friedrich-Wilhelm                               Team-Coach" textFill="WHITE">
+            <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="1589.0" prefHeight="22.0" prefWidth="600.0" text="Friedrich-Wilhelm                           Team-Coach" textFill="WHITE">
                <font>
                   <Font size="24.0" />
                </font>
@@ -245,20 +277,20 @@
                   <Insets right="40.0" />
                </VBox.margin>
             </Label>
-            <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="1680.0" prefHeight="22.0" prefWidth="600.0" text="Rademacher                                                         " textFill="WHITE">
+            <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="1680.0" prefHeight="22.0" prefWidth="600.0" text="Rademacher                                                    " textFill="WHITE">
                <font>
                   <Font size="24.0" />
                </font>
             </Label>
-            <Label alignment="CENTER" prefHeight="26.0" prefWidth="600.0" text="Connect 'n Charge was originally developed for Primeo" textFill="WHITE">
+            <Label alignment="CENTER" prefHeight="26.0" prefWidth="600.0" text="Connect 'n Charge was originally developed" textFill="WHITE">
                <font>
                   <Font name="System Italic" size="24.0" />
                </font>
                <VBox.margin>
-                  <Insets top="50.0" />
+                  <Insets top="100.0" />
                </VBox.margin>
             </Label>
-            <Label alignment="CENTER" layoutX="10.0" layoutY="1227.0" prefHeight="22.0" prefWidth="600.0" text="as part of the IP12 project track" textFill="WHITE">
+            <Label alignment="CENTER" layoutX="10.0" layoutY="1227.0" prefHeight="22.0" prefWidth="600.0" text="for Primeo as part of the IP12 project track" textFill="WHITE">
                <font>
                   <Font name="System Italic" size="24.0" />
                </font>
@@ -268,7 +300,7 @@
                   <Font name="System Italic" size="24.0" />
                </font>
                <VBox.margin>
-                  <Insets bottom="50.0" />
+                  <Insets bottom="100.0" />
                </VBox.margin>
             </Label>
             <Label alignment="CENTER" layoutX="10.0" layoutY="1398.0" prefHeight="22.0" prefWidth="600.0" text="The game was built twice, once for Primeo" textFill="WHITE">
@@ -281,15 +313,15 @@
                   <Font name="System Italic" size="24.0" />
                </font>
             </Label>
-            <Label alignment="CENTER" layoutX="10.0" layoutY="1227.0" prefHeight="22.0" prefWidth="600.0" text="The second edition (you're staring at it!)" textFill="WHITE">
+            <Label alignment="CENTER" layoutX="10.0" layoutY="1227.0" prefHeight="22.0" prefWidth="600.0" text="You're looking at the second edition." textFill="WHITE">
                <font>
                   <Font name="System Italic" size="24.0" />
                </font>
                <VBox.margin>
-                  <Insets top="20.0" />
+                  <Insets top="50.0" />
                </VBox.margin>
             </Label>
-            <Label alignment="CENTER" layoutX="10.0" layoutY="1813.0" prefHeight="22.0" prefWidth="600.0" text="has additional features, like more sounds, animations" textFill="WHITE">
+            <Label alignment="CENTER" layoutX="10.0" layoutY="1813.0" prefHeight="22.0" prefWidth="600.0" text="It has more sounds, animations" textFill="WHITE">
                <font>
                   <Font name="System Italic" size="24.0" />
                </font>
@@ -304,7 +336,7 @@
                   <Font name="System Italic" size="24.0" />
                </font>
                <VBox.margin>
-                  <Insets top="20.0" />
+                  <Insets top="50.0" />
                </VBox.margin>
             </Label>
             <Label alignment="CENTER" layoutX="10.0" layoutY="1959.0" prefHeight="22.0" prefWidth="600.0" text="Marius Gebhardt" textFill="WHITE">
@@ -347,17 +379,22 @@
                               <Font size="24.0" />
                            </font>
                         </Label>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../../../images/GH_FHNW.png" />
                            </image></ImageView>
-                        <Label alignment="CENTER" layoutX="10.0" layoutY="45.0" prefHeight="22.0" prefWidth="600.0" text="https://github.com/fhnw-sgi-ip12-22vt/ip12-22vt_ladestationen" textFill="WHITE">
+                        <Label alignment="CENTER" layoutX="10.0" layoutY="45.0" prefHeight="22.0" prefWidth="600.0" text="https://github.com" textFill="WHITE">
                            <font>
                               <Font size="10.0" />
                            </font>
                            <VBox.margin>
                               <Insets top="10.0" />
                            </VBox.margin>
+                        </Label>
+                        <Label alignment="CENTER" layoutX="10.0" layoutY="255.0" prefHeight="22.0" prefWidth="600.0" text="/fhnw-sgi-ip12-22vt/ip12-22vt_ladestationen" textFill="WHITE">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
                         </Label>
                      </children>
                   </VBox>
@@ -368,7 +405,7 @@
                               <Font size="24.0" />
                            </font>
                         </Label>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../../../images/GH_MNG.png" />
                            </image>
@@ -380,6 +417,11 @@
                            <VBox.margin>
                               <Insets top="10.0" />
                            </VBox.margin>
+                        </Label>
+                        <Label alignment="CENTER" layoutX="10.0" layoutY="264.0" prefHeight="22.0" prefWidth="600.0" textFill="WHITE">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
                         </Label>
                      </children>
                   </VBox>
