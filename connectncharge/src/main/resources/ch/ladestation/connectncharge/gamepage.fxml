@@ -63,7 +63,7 @@
                 <Insets />
             </opaqueInsets>
         </AnchorPane>
-        <AnchorPane fx:id="menuPane" layoutX="550.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="274.0" style="-fx-background-radius: 25px;" styleClass="menu-pane" stylesheets="@../../../css/style.css" visible="false">
+        <AnchorPane fx:id="menuPane" layoutX="550.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="274.0" style="-fx-background-radius: 25px;" styleClass="menu-pane" stylesheets="@../../../css/style.css">
             <children>
                 <Button fx:id="menuCloseButton" layoutX="191.0" layoutY="15.0" minWidth="30.0" mnemonicParsing="false" onAction="#handleMenuCloseButton" prefHeight="38.0" prefWidth="60.0" stylesheets="@../../../css/style.css">
                     <font>
@@ -98,7 +98,7 @@
                   <String fx:value="hidden-button" />
                     </styleClass>
                 </Button>
-                <Button fx:id="bonusRoundButton" layoutX="42.0" layoutY="138.0" mnemonicParsing="false" onAction="#handleQuitGameButton" prefHeight="38.0" prefWidth="168.0" stylesheets="@../../../css/style.css" text="Bonus Spiel">
+                <Button fx:id="bonusRoundButton" disable="true" layoutX="42.0" layoutY="138.0" mnemonicParsing="false" onAction="#handleQuitGameButton" prefHeight="38.0" prefWidth="168.0" stylesheets="@../../../css/style.css" text="Bonus Spiel" visible="false">
                     <font>
                         <Font name="Arial Bold" size="18.0" />
                     </font>
@@ -107,7 +107,7 @@
                   <String fx:value="hidden-button" />
                </styleClass>
                 </Button>
-                <Button fx:id="bonusRoundIcon" layoutX="14.0" layoutY="146.0" minWidth="46.0" mnemonicParsing="false" onAction="#handleQuitGameButton" prefHeight="43.0" prefWidth="46.0" stylesheets="@../../../css/style.css">
+                <Button fx:id="bonusRoundIcon" disable="true" layoutX="14.0" layoutY="146.0" minWidth="46.0" mnemonicParsing="false" onAction="#handleQuitGameButton" prefHeight="43.0" prefWidth="46.0" stylesheets="@../../../css/style.css" visible="false">
                     <font>
                         <Font name="System Bold" size="18.0" />
                     </font>

@@ -101,7 +101,7 @@ public class HighscoreScreenController implements ViewMixin<Game, ControllerBase
 
     private void iniButtons() {
         if (playerName != null && endTime != null) {
-            btnBonus.setVisible(true);
+            btnBonus.setVisible(false); // not implemented
             btnPlayAgain.setVisible(true);
             GamePageController.setPublicEndTime(null);
         }

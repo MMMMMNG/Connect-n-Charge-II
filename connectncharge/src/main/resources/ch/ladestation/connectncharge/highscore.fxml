@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Line?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="800.0" styleClass="root-pane" stylesheets="@../../../css/style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.ladestation.connectncharge.controller.pagecontroller.end.HighscoreScreenController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="800.0" styleClass="root-pane" stylesheets="@../../../css/style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.ladestation.connectncharge.controller.pagecontroller.end.HighscoreScreenController">
     <children>
         <Button fx:id="btnPlayAgain" layoutX="70.0" layoutY="122.0" maxWidth="190.0" mnemonicParsing="false" onAction="#showGamePage" prefHeight="50.0" prefWidth="190.0" styleClass="play-again-button" stylesheets="@../../../css/style.css" text="Nochmal spielen" visible="false" />
-        <Button fx:id="btnBonus" layoutX="70.0" layoutY="238.0" mnemonicParsing="false" onAction="#showBonusPage" styleClass="highscore-button" stylesheets="@../../../css/style.css" text="Bonus spielen" textFill="WHITE" visible="false" />
+        <Button fx:id="btnBonus" disable="true" layoutX="70.0" layoutY="238.0" mnemonicParsing="false" onAction="#showBonusPage" styleClass="highscore-button" stylesheets="@../../../css/style.css" text="Bonus spielen" textFill="WHITE" visible="false" />
         <ImageView fx:id="imgHome" fitHeight="69.0" fitWidth="69.0" layoutX="128.0" layoutY="339.0" onMouseClicked="#showHomeScreen" pickOnBounds="true" preserveRatio="true">
             <image>
                 <Image url="@../../../images/home.png" />

@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.shape.Circle?>
-<?import javafx.scene.text.Font?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="800.0" styleClass="root-pane" stylesheets="@../../../css/style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.ladestation.connectncharge.controller.pagecontroller.beginning.EdgeClickScreenController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="800.0" styleClass="root-pane" stylesheets="@../../../css/style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.ladestation.connectncharge.controller.pagecontroller.beginning.EdgeClickScreenController">
     <children>
         <Circle fill="#f4e158" layoutX="800.0" radius="100.0" stroke="BLACK" strokeType="INSIDE" styleClass="loading-button" />
         <Circle fx:id="r" fill="#f4e158" radius="100.0" stroke="BLACK" strokeType="INSIDE" />
@@ -76,7 +73,7 @@
                   <String fx:value="hidden-button" />
                     </styleClass>
                 </Button>
-                <Button layoutX="42.0" layoutY="138.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="168.0" stylesheets="@../../../css/style.css" text="Bonus Spiel">
+                <Button disable="true" layoutX="42.0" layoutY="138.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="168.0" stylesheets="@../../../css/style.css" text="Bonus Spiel" visible="false">
                     <font>
                         <Font name="Arial Bold" size="18.0" />
                     </font>
@@ -85,7 +82,7 @@
                   <String fx:value="hidden-button" />
                </styleClass>
                 </Button>
-                <Button layoutX="14.0" layoutY="146.0" minWidth="46.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="46.0" stylesheets="@../../../css/style.css">
+                <Button disable="true" layoutX="14.0" layoutY="146.0" minWidth="46.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="46.0" stylesheets="@../../../css/style.css" visible="false">
                     <font>
                         <Font name="System Bold" size="18.0" />
                     </font>
