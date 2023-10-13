@@ -63,7 +63,7 @@
                 <Insets />
             </opaqueInsets>
         </AnchorPane>
-        <AnchorPane fx:id="menuPane" layoutX="550.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="274.0" style="-fx-background-radius: 25px;" styleClass="menu-pane" stylesheets="@../../../css/style.css">
+        <AnchorPane fx:id="menuPane" layoutX="550.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="274.0" style="-fx-background-radius: 25px;" styleClass="menu-pane" stylesheets="@../../../css/style.css" visible="false">
             <children>
                 <Button fx:id="menuCloseButton" layoutX="191.0" layoutY="15.0" minWidth="30.0" mnemonicParsing="false" onAction="#handleMenuCloseButton" prefHeight="38.0" prefWidth="60.0" stylesheets="@../../../css/style.css">
                     <font>
