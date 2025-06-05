@@ -83,6 +83,13 @@ link:https://de.aliexpress.com/item/1005004266492521.html[Store-Link]
 Artikelnummer: 711-5 +
 //link:https://www.dropbox.com/s/0ih5ivof7717e8x/Laborkarte-711-5.pdf?dl=0[Datasheet]
 link:../resources/Laborkarte-711-5.pdf[Datasheet]
+
+|18CHF
+|5x
+|Custom PCB für die GPIO extension chips. +
+Bestellt bei link:https://www.pcbway.com/[PCBway] ($10 Versandkosten + $8 für 5 PLatinen (Mindestbestellmenge) +
+link:../resources/PCB/PCB_v29_2023-03-27.zip[PCB-Files]
+
 //Row 6
 |09CHF
 |5x
@@ -125,7 +132,7 @@ link:https://de.aliexpress.com/item/1005002624496206.html[Store-Link]
 |04CHF
 |1x
 |Logic level converter IC +
-3.3V zu 5V, SN74HCT125
+3.3V zu 5V, SN74HCT125 +
 //link:https://www.dropbox.com/s/xds745duzoubhpp/sn74hct125.pdf?dl=0[Datasheet]
 link:../resources/sn74hct125.pdf[Datasheet]
 //Row 6

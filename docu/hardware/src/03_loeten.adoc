@@ -139,7 +139,8 @@ link:../resources/3D-Modelle[Haus]
 
 === PCB / Platine
 ****
-Der PCB verbindet alle Komponente auf Hardwareebene mit der Verkabelung.
+Das PCB verbindet alle Komponenten auf Hardwareebene mit der Verkabelung.
+Es wurde in Fusion 360 designed. Für die files, siehe link:../resources/PCB/PCB_v29_2023-03-27.zip[PCB-Files]
 
 image::../images/Loeten/PlatineLoetenHinten.PNG["Platine loeten hinten", align="center"]
 image::../images/Loeten/PlatineLoetenVorne.PNG["Platine loeten vorne", align="center"]
